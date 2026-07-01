@@ -14,6 +14,9 @@ from logging.config import fileConfig
 from alembic import context
 import os
 
+# 导入 ORM 模型元数据以支持 autogenerate
+from app.db.base import Base
+
 config = context.config
 
 # 从环境变量覆盖数据库连接地址
@@ -26,10 +29,8 @@ if database_url:
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# 元数据导入（后续 ORM 模型实现后更新）
-# from app.db.base import Base
-# target_metadata = Base.metadata
-target_metadata = None
+# 设置 Alembic 迁移目标元数据（指向所有 ORM 模型的 Base.metadata）
+target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
