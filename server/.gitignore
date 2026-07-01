@@ -1,0 +1,30 @@
+# 环境变量文件（含敏感信息）
+.env
+.env.*
+!.env.*.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+.docker/
+
+# 日志
+logs/*.log
+
+# 图片上传
+images/
+
+# 备份
+backups/
+
+# 操作系统
+.DS_Store
+Thumbs.db
