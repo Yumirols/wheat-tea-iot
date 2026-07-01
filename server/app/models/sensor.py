@@ -5,7 +5,7 @@ FarmEye Guard v1.0 — Sensor ORM 模型
 - sensor_snapshot：环境数据快照（温度、湿度、光照、CO2、土壤NPK等）
 - sensor_daily_aggregation：传感器日聚合数据
 """
-from sqlalchemy import Column, BigInteger, String, Integer, SmallInteger, Numeric, DateTime, Date
+from sqlalchemy import Column, BigInteger, String, Integer, SmallInteger, Numeric, DateTime, Date, UniqueConstraint
 
 from app.db.base import Base
 
@@ -40,6 +40,10 @@ class SensorDailyAggregation(Base):
     """传感器日聚合数据表（sensor_daily_aggregation）"""
 
     __tablename__ = "sensor_daily_aggregation"
+
+    __table_args__ = (
+        UniqueConstraint('device_id', 'agg_date', name='uq_sensor_daily_agg_device_date'),
+    )
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     device_id = Column(String(64), nullable=False)

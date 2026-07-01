@@ -50,10 +50,10 @@
   | 表名 | 文件 | 字段数 | 关键字段 |
   |------|------|--------|---------|
   | sensor_snapshot | models/sensor.py | 16 | device_id, temperature, humidity, light, co2, soil_n/p/k, rssi, alarm_flag |
-  | sensor_daily_aggregation | models/sensor.py | 18 | agg_date, avg/max/min 温度/湿度/光照/CO2, record_count |
+  | sensor_daily_aggregation | models/sensor.py | 17 | agg_date, avg/max/min 温度/湿度/光照/CO2, record_count |
   | disease_records | models/disease.py | 13 | crop_type, disease_type, confidence, severity, severity_code, linkage_* |
   | control_logs | models/control.py | 10 | command_id, command, source, operator, result_code, result_msg |
-  | devices | models/control.py | 8 | device_id(unique), device_name, mac_addr, online |
+  | devices | models/control.py | 9 | device_id(unique), device_name, mac_addr, online |
 - **models/__init__.py**：统一导出所有 5 个模型类，Alembic `target_metadata = Base.metadata` 自动发现
 
 ### 4. Pydantic Schema（schemas/）

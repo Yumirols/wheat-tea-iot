@@ -6,7 +6,6 @@ FarmEye Guard v1.0 — FastAPI 应用入口
 """
 import time
 import logging
-from contextlib import suppress
 from sqlalchemy import text
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
