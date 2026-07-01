@@ -84,14 +84,23 @@
 结果：修复了 3 个遗留问题（UniqueConstraint 约束、未使用 import 删除、do_v3.md 字段计数）+ Python 导入验证通过。
 检查：全部 5 项检查通过。
 
-## R4 NEW API 基础设施与传感器数据管道 [ID: T5]
-任务：创建 API 基础设施层（路由注册 + API Key 认证依赖注入）和传感器数据管道（IoTDA Webhook 数据摄入 + 传感器查询接口 + 传感器/IoTDA 业务服务），包括：
-  - server/app/api/deps.py（API Key 认证依赖 + get_db 重导出）
-  - server/app/api/router.py（统一路由注册，挂载所有 v1 端点）
-  - server/app/api/v1/iotda.py（IoTDA Webhook：properties/report、ai/report、cmd/response 三个处理函数）
-  - server/app/api/v1/sensor.py（传感器查询端点：latest、history、daily）
-  - server/app/services/sensor_service.py（传感器数据 CRUD、分页查询、日聚合查询、设备自动注册）
-  - server/app/services/iotda_client.py（IoTDA HTTP 客户端，命令下发）
-  - server/app/main.py（增加 router.include_router，导入 iotda 和 sensor 路由器）
-选择理由：API 基础设施是所有前端交互的基础，IoTDA Webhook 是数据摄入的唯一入口，传感器查询是最核心的数据读取路径。这三者构成完整的传感器数据管道，是实现可运行 API 服务的最低可行单元。完成 T5 后，API 服务可以通过 IoTDA Webhook 接收传感器数据并通过 REST API 查询，具备基本的可用性。
-上下文：参考 `docs/2_vps-deployment.md` 第 4.2.1 节（IoTDA Webhook 测试规格，含 payload 格式、响应格式、9 个核心测试场景）和 4.2.2 节（传感器查询测试规格，含 latest/history/daily/分页/边界条件）。已有管道：server/ 下已有完整的 FastAPI 骨架（config/db/models/schemas/main.py），依赖管理（requirements.txt 含 httpx 和 Pillow 等），DDL 建表（init/01_create_tables.sql），所有模型与 Schema 均已到位。T5 产出的 API 端点和业务服务依赖这些现有基础设施。
+## R4 PASSED API 基础设施与传感器数据管道 [ID: T5]
+结果：创建了 6 个新文件（deps.py、router.py、iotda.py、sensor.py、sensor_service.py、iotda_client.py）并修改了 main.py 和 schemas/sensor.py。认证策略分层（IoTDA 无认证、查询端点 API Key 认证），IoTDA Webhook 实现 3 个端点（properties/report、ai/report、cmd/response）含幂等性和设备自动注册，传感器查询实现 3 个端点（latest/history/daily）含分页和时间范围筛选。sensor_service 提供 CRUD 和日聚合查询，iotda_client 为桩实现并预留真实调用骨架。
+检查：全部 12 项检查 PASSED。
+
+---
+
+## R5 NEW 病虫害/设备/命令控制 API 端点与服务 [ID: T6]
+任务：创建病虫害记录、设备列表、命令控制三组 API 端点及其业务服务层，包括：
+  - server/app/schemas/device.py（DeviceRead 响应 Schema）
+  - server/app/services/disease_service.py（病虫害记录查询、统计聚合、热力图数据）
+  - server/app/services/command_service.py（命令创建与下发、控制日志分页查询）
+  - server/app/api/v1/disease.py（病虫害端点：列表多条件筛选、统计、热力图）
+  - server/app/api/v1/device.py（设备端点：设备列表与在线状态）
+  - server/app/api/v1/command.py（命令控制端点：命令下发、日志列表分页筛选）
+  - 修改 server/app/schemas/__init__.py（添加 DeviceRead 导出）
+  - 修改 server/app/api/router.py（注册 disease/device/command 三个子路由）
+
+选择理由：DiseaseRecord、ControlLog、Device 的 ORM 模型和 Pydantic Schema（DiseaseRecordRead、DiseaseStatsResponse、CommandCreate/Read/Response）已在 T3/T4 准备就绪，iotda_client.send_command 也在 T5 中实现。这三组端点覆盖任务范围中剩余 API 端点的核心部分，而且都遵循与 sensor 端点相同的模式（FastAPI router + Depends 认证 + Pydantic 响应），业务逻辑明确且代码量适中。完成 T6 后，REST API 层面除 advisory（含联动分析决策引擎）和 image（文件上传模式不同）外，其余端点全部到位。
+
+上下文：参考 `docs/2_vps-deployment.md` §4.2.3（病虫害记录接口测试 5 个用例）、§4.2.2 测试编号 17（获取设备列表）、§4.2.4（设备控制接口测试 6 个用例）。已有产出：server/app/ 下已有完整的 FastAPI 骨架、models（SensorSnapshot/DailyAggregation/DiseaseRecord/ControlLog/Device）、schemas（common/sensor/disease/command）、deps.py（API Key 认证）、router.py（统一路由注册，含 TODO 占位符）、iotda_client.py（send_command 桩，command_service 可直接调用）。

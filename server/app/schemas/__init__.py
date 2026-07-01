@@ -7,6 +7,7 @@ from app.schemas.common import ResponseModel, PaginationParams, PaginationMeta
 from app.schemas.sensor import SensorSnapshotRead, SensorHistoryResponse
 from app.schemas.disease import DiseaseRecordRead, DiseaseStatsResponse
 from app.schemas.command import CommandCreate, CommandRead, CommandResponse
+from app.schemas.device import DeviceRead
 
 __all__ = [
     "ResponseModel",
@@ -19,4 +20,5 @@ __all__ = [
     "CommandCreate",
     "CommandRead",
     "CommandResponse",
+    "DeviceRead",
 ]
