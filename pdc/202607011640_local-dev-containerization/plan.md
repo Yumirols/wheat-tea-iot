@@ -171,3 +171,39 @@
   - §3.5 容器资源限制表
 
 详细规格见 task_v8.md。修正方向详见 plan_review_v8_r2.md。
+
+---
+
+## R9 PASSED Docker 容器化配置 [ID: T8]
+结果：创建了 4 个 Docker 容器化文件（Dockerfile、docker-compose.yml、docker-compose.prod.yml、entrypoint.sh），所有内容与 task_v8.md 要求一致。
+检查：check_v8.md 中 7 大类共 55+ 项检查全部 PASSED。
+
+## R9 REJECTED 自动化测试 - 测试基础设施与API单元测试 [ID: T9]
+审查发现（详见 plan_review_v9_r1.md）：
+1. 测试用例数量声称不精确：计划第 194 行声称"48 个测试用例"，但逐项描述仅列出 37 个 API 单元测试用例（#1-#35、#39-#40），与实际规格偏差
+2. async_client fixture 描述不精确：计划第 184 行"依赖覆盖 TestClient"应为"httpx.AsyncClient + ASGITransport"
+3. 未体现推荐执行顺序：task_v9.md 第 113 行建议 test_health.py 和 test_device.py 应优先验证，计划未提及此优先级信息
+
+## R9 RETRY 自动化测试 - 测试基础设施与API单元测试 [ID: T9]
+任务：在 server/tests/ 目录下创建测试基础设施和所有 API 单元测试文件。根据设计文档 §4.1-4.2 的测试方案，实现以下产出：
+  - server/tests/__init__.py（包标识文件）
+  - server/tests/conftest.py（pytest 钩子、event_loop、async_client 使用 httpx.AsyncClient + ASGITransport 包装 FastAPI app 并通过 dependency_overrides 注入 Mock、mock_db_session 模拟 SessionLocal、sample_sensor_payload/sample_ai_payload/sample_command_response_payload 三组测试 payload、pytest_addoption/pytest_configure/pytest_collection_modifyitems 钩子实现条件跳过）
+  - server/tests/test_health.py（测试用例 39-40：全部正常返回 200+status=healthy、DB 断开时返回 503+status=degraded）
+  - server/tests/test_device.py（测试用例 17：设备列表返回含在线状态）—— 与 test_health 同为依赖最少的优先验证文件
+  - server/tests/test_iotda_webhook.py（测试用例 1-9：传感器属性上报、AI 识别上报、命令应答上报、重复上报幂等性、无效 payload、未知 service_id、DB 写入失败回滚、设备自动注册）
+  - server/tests/test_sensor.py（测试用例 10-16：latest 指定设备/不指定设备、history 分页/时间范围/page_size 上限/page 超出范围、日聚合查询）
+  - server/tests/test_disease.py（测试用例 18-22：多条件筛选、时间范围、统计、热力图、无数据空响应）
+  - server/tests/test_command.py（测试用例 23-28：手动下发成功、设备离线返回 1003、缺少必填字段 422、source 筛选、时间范围筛选、分页）
+  - server/tests/test_advisory.py（测试用例 29-31：有最新检测返回建议、无检测时 advisory=null、含环境联动分析）
+  - server/tests/test_image.py（测试用例 32-35：上传关联疾病记录、文件过大拒绝、获取已有图片、获取不存在图片返回 code=1002）
+
+选择理由：修正 Plan Review 发现的 3 个问题，确保 plan.md 中的任务描述与 task_v9.md 规格一致。修正方向详见 plan_review_v9_r1.md。按 conftest.py → test_health.py + test_device.py（依赖最少优先验证）→ 其余 API 测试文件的顺序执行。
+
+上下文：参考 `docs/2_vps-deployment.md` 第 4 章（测试方案）：
+  - §4.1.2-4.1.3 测试目录结构、conftest.py 完整代码（含 pytest 钩子和 fixture 定义）
+  - §4.2 API 接口测试表格（48 个测试用例，每个测试用例的输入、预期结果、类型）
+  - server/app/ 下已有完整 API 端点代码、ORM 模型、Service 层、config.py、db/session.py
+  - server/requirements-dev.txt 已含 pytest、pytest-asyncio、httpx 依赖
+  - server/app/main.py 已创建 app 实例，可通过 httpx.AsyncClient + ASGITransport 直接调用
+  - server/app/api/deps.py 定义了 get_db 和 verify_api_key 依赖，可通过 dependency_overrides 注入 Mock
+  - tests/ 目录当前不存在，需从零创建
