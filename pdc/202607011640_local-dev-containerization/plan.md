@@ -90,17 +90,35 @@
 
 ---
 
-## R5 NEW 病虫害/设备/命令控制 API 端点与服务 [ID: T6]
-任务：创建病虫害记录、设备列表、命令控制三组 API 端点及其业务服务层，包括：
-  - server/app/schemas/device.py（DeviceRead 响应 Schema）
-  - server/app/services/disease_service.py（病虫害记录查询、统计聚合、热力图数据）
-  - server/app/services/command_service.py（命令创建与下发、控制日志分页查询）
-  - server/app/api/v1/disease.py（病虫害端点：列表多条件筛选、统计、热力图）
-  - server/app/api/v1/device.py（设备端点：设备列表与在线状态）
-  - server/app/api/v1/command.py（命令控制端点：命令下发、日志列表分页筛选）
-  - 修改 server/app/schemas/__init__.py（添加 DeviceRead 导出）
-  - 修改 server/app/api/router.py（注册 disease/device/command 三个子路由）
+## R5 PASSED 病虫害/设备/命令控制 API 端点与服务 [ID: T6]
+结果：创建了 6 个新文件（disease.py、device.py、command.py、device.py schema、disease_service.py、command_service.py）、修改 2 个文件（router.py、schemas/__init__.py）。6 条新增 API 路由完整注册（disease/list、disease/stats、disease/heatmap、device/list、command/send、command/logs），Python 导入链通过验证。
+检查：全部 12 项检查 PASSED。
 
-选择理由：DiseaseRecord、ControlLog、Device 的 ORM 模型和 Pydantic Schema（DiseaseRecordRead、DiseaseStatsResponse、CommandCreate/Read/Response）已在 T3/T4 准备就绪，iotda_client.send_command 也在 T5 中实现。这三组端点覆盖任务范围中剩余 API 端点的核心部分，而且都遵循与 sensor 端点相同的模式（FastAPI router + Depends 认证 + Pydantic 响应），业务逻辑明确且代码量适中。完成 T6 后，REST API 层面除 advisory（含联动分析决策引擎）和 image（文件上传模式不同）外，其余端点全部到位。
+---
 
-上下文：参考 `docs/2_vps-deployment.md` §4.2.3（病虫害记录接口测试 5 个用例）、§4.2.2 测试编号 17（获取设备列表）、§4.2.4（设备控制接口测试 6 个用例）。已有产出：server/app/ 下已有完整的 FastAPI 骨架、models（SensorSnapshot/DailyAggregation/DiseaseRecord/ControlLog/Device）、schemas（common/sensor/disease/command）、deps.py（API Key 认证）、router.py（统一路由注册，含 TODO 占位符）、iotda_client.py（send_command 桩，command_service 可直接调用）。
+## R6 NEW 防治建议联动分析与图片管理 API [ID: T7]
+任务：实现防治建议（Advisory）联动分析决策引擎及其 API 端点，以及图片上传管理 API 端点。包含：
+  - server/app/services/advisory_service.py：联动分析决策引擎，实现病虫害 × 环境条件匹配、风险等级评估、防治建议生成
+  - server/app/api/v1/advisory.py：GET /api/v1/advisory 防治建议查询端点
+  - server/app/api/v1/image.py：POST /api/v1/image/upload 图片上传 + GET /api/v1/image/{image_id} 图片获取端点
+  - server/app/services/data_retention.py：APScheduler 定时任务，每日凌晨执行数据保留清理
+  - 修改 server/app/api/router.py：注册 advisory 和 image 子路由
+  - 修改 server/app/schemas/__init__.py：添加 AdvisoryResponse、ImageUploadResponse 等 Schema 导出
+
+选择理由：T5 已实现 IoTDA Webhook（含 ai/report 联动分析触发入口），T6 已完成 disease/device/command 三组核心查询端点。接下来完成剩余的 advisory（含决策引擎）和 image（文件上传模式）两个 API 端点，以及 data_retention 后台定时任务。这三组功能（advisory + image + data_retention）都直接依赖 T3/T4 的 ORM 模型和 T5 的 iotda_client，且相互独立。其中 advisory_service 的决策引擎是业务最复杂的部分（病虫害 × 环境条件决策矩阵），而 image 是唯一使用 multipart 文件上传的端点，data_retention 是唯一的后台定时任务。合并为一个子任务将导致过载，但将 advisory 服务层和端点放在一起（紧密耦合决策逻辑）再将 image + data_retention 作为单独子任务又显得碎片化。综合考虑：
+  - advisory_service（决策引擎）和 advisory.py API 端点紧密耦合，必须同组
+  - image 端点模式单一（文件上传/获取），代码量适中（约 100-150 行）
+  - data_retention 很小（约 60 行）
+  - 三者都属于"完成剩余 API/服务"这一关注点，且对已有代码的修改模式相同（注册路由 + 导出 Schema）
+  因此合入同一子任务，但 image 和 data_retention 作为相对独立的部分分别实现。
+
+上下文：参考设计文档：
+  - `docs/1_system_architecture.md` §4.6 防治建议接口（advisory API 响应格式）
+  - `docs/1_system_architecture.md` §2.4 决策规则矩阵（12 条规则，含病虫害 × severity_code × 环境条件匹配）
+  - `docs/1_system_architecture.md` §4.7 图片接口（上传/获取/存储策略）
+  - `docs/2_vps-deployment.md` §2.4 数据保留与清理策略（cleanup_expired_data 实现）
+  - `docs/2_vps-deployment.md` §4.2.5 防治建议与图片接口测试用例 29-35
+  - `server/app/models/disease.py`（DiseaseRecord 已有 linkage_risk_level、linkage_detail 字段）
+  - `server/app/services/sensor_service.py`（环境数据查询参考）
+  - `server/app/config.py`（已配置 ADVISORY_WINDOW_MINUTES、IMAGE_STORAGE_PATH、DATA_RETENTION_*）
+已有产出：server/app/ 下已有完整的应用骨架（models、schemas、services、api 目录），IoTDA Webhook 含 ai/report 联动分析入口点，DiseaseRecord 模型已含 linkage 字段，config.py 已含 advisory/image/retention 相关配置项。
