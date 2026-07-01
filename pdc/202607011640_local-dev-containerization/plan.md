@@ -96,7 +96,25 @@
 
 ---
 
-## R6 NEW 防治建议联动分析与图片管理 API [ID: T7]
+## R7 PASSED 防治建议联动分析与图片管理 API [ID: T7]
+结果：创建了 4 个新文件（advisory_service.py, advisory.py, image.py, data_retention.py），修改 2 个已有文件（router.py, schemas/__init__.py）。advisory_service 实现完整的 12 条决策规则矩阵（4 种病虫害 x 3 级严重程度），image API 实现上传/获取文件管理（类型/大小验证、路径遍历防护），data_retention 实现三段式清理流程。
+检查：全部 36 项检查 PASSED。
+
+## R8 NEW Docker 容器化配置 [ID: T8]
+任务：在 server/ 目录下创建 Docker 容器化配置，包括：
+  - server/Dockerfile：多阶段构建（base/dev/prod），基于 python:3.13-slim
+  - server/docker-compose.yml：主编排文件（API 服务 + PostgreSQL 16），开发环境
+  - server/docker-compose.prod.yml：生产环境覆写（资源限制、重启策略、日志驱动）
+  - server/entrypoint.sh：容器入口脚本（Alembic 迁移 + 应用启动）
+
+选择理由：所有 API 代码已完成。下一步需要将应用容器化，使其可构建和运行。Docker 配置是基础设施层，测试和部署都依赖容器化环境。完成后即可验证完整服务栈的启动流程。
+
+上下文：参考 `docs/2_vps-deployment.md` 第 4 章（容器化部署）§4.1-4.4：
+  - §4.1 Dockerfile 多阶段构建（base 安装依赖、dev 启用热重载、prod 生产优化）
+  - §4.2 docker-compose.yml 服务定义（api + db 两个服务，环境变量共享）
+  - §4.3 docker-compose.prod.yml 生产覆写（CPU/内存限制、always 重启、json-file 日志）
+  - §4.4 entrypoint.sh（alembic upgrade head + uvicorn 启动）
+  - server/ 下已有 requirements.txt、app/ 完整代码、init/ SQL 脚本、alembic/ 迁移框架
 任务：实现防治建议（Advisory）联动分析决策引擎及其 API 端点，以及图片上传管理 API 端点。包含：
   - server/app/services/advisory_service.py：联动分析决策引擎，实现病虫害 × 环境条件匹配、风险等级评估、防治建议生成
   - server/app/api/v1/advisory.py：GET /api/v1/advisory 防治建议查询端点
@@ -122,3 +140,34 @@
   - `server/app/services/sensor_service.py`（环境数据查询参考）
   - `server/app/config.py`（已配置 ADVISORY_WINDOW_MINUTES、IMAGE_STORAGE_PATH、DATA_RETENTION_*）
 已有产出：server/app/ 下已有完整的应用骨架（models、schemas、services、api 目录），IoTDA Webhook 含 ai/report 联动分析入口点，DiseaseRecord 模型已含 linkage 字段，config.py 已含 advisory/image/retention 相关配置项。
+
+---
+
+## R8 REJECTED Docker 容器化配置 [ID: T8]
+审查发现（详见 plan_review_v8_r2.md）：
+1. 基础镜像错误：plan 写为 `python:3.13-slim`，task_v8.md 要求 `ubuntu:25.04`
+2. docker-compose.yml 描述缺失 api-dev 服务（dev profile）
+3. docker-compose.prod.yml 描述缺失 nginx 服务
+4. entrypoint.sh 描述过于简略，缺少两阶段迁移检测逻辑
+5. R8 段尾残留 T7 任务描述（冗余内容）
+6. 设计文档引用编号不一致（使用 §4.x 体系，应统一为 §1.x）
+
+## R8 RETRY Docker 容器化配置 [ID: T8]
+任务：在 server/ 目录下创建 Docker 容器化配置，包括 4 个文件：
+  - server/Dockerfile：多阶段构建（base/dev/prod），基于 ubuntu:25.04，与 VPS 系统保持一致
+  - server/docker-compose.yml：主编排（api + db + api-dev 三个服务，双 profile：production/dev）
+  - server/docker-compose.prod.yml：生产覆写（nginx 反向代理 + 日志驱动 + 重启策略 + 资源限制）
+  - server/entrypoint.sh：容器入口脚本（alembic current 检测已有迁移版本，根据 STRICT_MIGRATION 标记决定失败处理策略）
+
+选择理由：修正 Plan Review 发现的 6 个问题，确保 plan.md 中的任务描述与 task_v8.md 规格完全一致。
+
+上下文：参考 `docs/2_vps-deployment.md`：
+  - §1.4 Dockerfile 设计（多阶段构建，基于 ubuntu:25.04）
+  - §1.5 docker-compose.yml 设计（api + db + api-dev 三服务，双 profile）
+  - §1.5.2 docker-compose.prod.yml（含 nginx 服务定义）
+  - §1.6 生产/开发配置分离策略表
+  - §1.7 健康检查配置
+  - §5.4.4 entrypoint.sh（两阶段迁移检测与失败处理）
+  - §3.5 容器资源限制表
+
+详细规格见 task_v8.md。修正方向详见 plan_review_v8_r2.md。

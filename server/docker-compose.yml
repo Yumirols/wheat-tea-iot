@@ -1,0 +1,112 @@
+version: "3.9"
+
+services:
+  # ── 生产 API 服务 ─────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      target: prod
+    container_name: farmeye-api
+    ports:
+      - "127.0.0.1:8000:8000"  # 仅监听 localhost，由 Nginx 转发
+    env_file:
+      - .env.prod
+    volumes:
+      - images_data:/app/images
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8000/api/v1/health | grep -q '\"status\":\"healthy\"' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - production
+    networks:
+      - farmeye-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ── 数据库服务 ────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: farmeye-db
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: farmeye
+      POSTGRES_PASSWORD: farmeye_pwd
+      POSTGRES_DB: farmeye_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./init/:/docker-entrypoint-initdb.d/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U farmeye -d farmeye_db || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - farmeye-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    # 1GB RAM 环境 PostgreSQL 参数调优
+    command: >
+      -c shared_buffers=64MB
+      -c effective_cache_size=256MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=16MB
+      -c max_connections=10
+
+  # ── 开发 API 服务（通过 --profile dev 启用）───────────────────
+  api-dev:
+    build:
+      context: .
+      target: dev
+    container_name: farmeye-api-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.dev
+    volumes:
+      - ./app:/app/app
+      - images_data:/app/images
+      - ./logs:/app/logs
+      - ./tests:/app/tests
+    healthcheck:
+      disable: true  # dev 模式禁用 healthcheck，避免 reload 中断探测
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - farmeye-net
+    profiles:
+      - dev  # 仅通过 `--profile dev` 启动
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+networks:
+  farmeye-net:
+    driver: bridge
+
+volumes:
+  db_data:
+  images_data:
