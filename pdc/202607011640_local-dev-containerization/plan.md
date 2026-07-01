@@ -207,3 +207,31 @@
   - server/app/main.py 已创建 app 实例，可通过 httpx.AsyncClient + ASGITransport 直接调用
   - server/app/api/deps.py 定义了 get_db 和 verify_api_key 依赖，可通过 dependency_overrides 注入 Mock
   - tests/ 目录当前不存在，需从零创建
+
+---
+
+## R10 PASSED 自动化测试 - 测试基础设施与API单元测试 [ID: T9]
+结果：在 server/tests/ 目录下创建了 10 个测试文件（含 conftest.py、pytest.ini），37 个测试用例全部通过（0.22s），覆盖设计文档 §4.2 用例 #1-#35、#39-#40。使用 httpx.AsyncClient + ASGITransport + dependency_overrides（Mock DB + 跳过认证），无需真实外部服务。
+检查：check_v9.md 全部 29 项检查 PASSED。test_unknown_service_id 含 DB 未写入断言，event_loop fixture 已添加。
+
+---
+
+## R10 NEW 基础设施：Nginx 反向代理与部署脚本 [ID: T10]
+任务：在 server/ 目录下创建 Nginx 反向代理配置文件和 VPS 部署运维脚本，包括：
+  - server/nginx/farmeye.conf（Nginx 反向代理配置，含 upstream API、HTTP→HTTPS 重定向、SSL、静态图片直连）
+  - server/deploy/scripts/start.sh（VPS 生产启动脚本，合并 docker-compose.yml + docker-compose.prod.yml + --profile production）
+  - server/deploy/scripts/stop.sh（VPS 生产停止脚本，支持 --down 和 --volumes 选项）
+  - server/deploy/scripts/restart.sh（VPS 生产重启脚本）
+  - server/deploy/scripts/backup.sh（数据库备份脚本，支持每日/每周模式）
+
+选择理由：所有应用代码（API、Service、Model）、Docker 容器化配置和 API 单元测试均已完成。下一步完成剩余的生产运维配套文件——Nginx 反向代理配置和 VPS 部署脚本。这些文件不依赖其他模块，可以独立创建和验证。
+
+上下文：参考 `docs/2_vps-deployment.md`：
+  - §3.3 Nginx 反向代理配置（含 farmeye.conf 完整配置，upstream/HTTP→HTTPS/SSL/静态图片/健康检查/日志格式）
+  - §3.3.2 Nginx 启用/禁用说明
+  - §3.6.1 start.sh（合并主文件+生产覆写，含健康检查等待循环）
+  - §3.6.2 stop.sh（默认 stop，--down 移除容器，--volumes 移除数据卷）
+  - §3.6.3 restart.sh
+  - §2.3.2 backup.sh（每日 pg_dump plain / 每周 custom format，含过期清理）
+  - server/ 下已有 Dockerfile、docker-compose.yml、docker-compose.prod.yml、entrypoint.sh
+  - server/nginx/ 和 server/deploy/scripts/ 目录当前均不存在，需从零创建
