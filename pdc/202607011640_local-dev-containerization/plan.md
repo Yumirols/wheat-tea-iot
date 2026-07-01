@@ -77,4 +77,21 @@
 
 选择理由：T3 的审议已超限但产出代码基础基本正确，仅剩 3 个具体的技术性问题需要修复。创建新的直接修复任务（T4）绕过卡住的审议循环，以最小的变更完成 T3 目标。T4 不需要复杂的设计审议，而是直接应用已知的修复方案，完成后 T3 视为有效完成。
 
-上下文：修复不更改架构设计，仅在现有代码上进行精准修改。
+
+---
+
+## R4 PASSED 修复 T3 遗留问题并完成 FastAPI 基础框架 [ID: T4]
+结果：修复了 3 个遗留问题（UniqueConstraint 约束、未使用 import 删除、do_v3.md 字段计数）+ Python 导入验证通过。
+检查：全部 5 项检查通过。
+
+## R4 NEW API 基础设施与传感器数据管道 [ID: T5]
+任务：创建 API 基础设施层（路由注册 + API Key 认证依赖注入）和传感器数据管道（IoTDA Webhook 数据摄入 + 传感器查询接口 + 传感器/IoTDA 业务服务），包括：
+  - server/app/api/deps.py（API Key 认证依赖 + get_db 重导出）
+  - server/app/api/router.py（统一路由注册，挂载所有 v1 端点）
+  - server/app/api/v1/iotda.py（IoTDA Webhook：properties/report、ai/report、cmd/response 三个处理函数）
+  - server/app/api/v1/sensor.py（传感器查询端点：latest、history、daily）
+  - server/app/services/sensor_service.py（传感器数据 CRUD、分页查询、日聚合查询、设备自动注册）
+  - server/app/services/iotda_client.py（IoTDA HTTP 客户端，命令下发）
+  - server/app/main.py（增加 router.include_router，导入 iotda 和 sensor 路由器）
+选择理由：API 基础设施是所有前端交互的基础，IoTDA Webhook 是数据摄入的唯一入口，传感器查询是最核心的数据读取路径。这三者构成完整的传感器数据管道，是实现可运行 API 服务的最低可行单元。完成 T5 后，API 服务可以通过 IoTDA Webhook 接收传感器数据并通过 REST API 查询，具备基本的可用性。
+上下文：参考 `docs/2_vps-deployment.md` 第 4.2.1 节（IoTDA Webhook 测试规格，含 payload 格式、响应格式、9 个核心测试场景）和 4.2.2 节（传感器查询测试规格，含 latest/history/daily/分页/边界条件）。已有管道：server/ 下已有完整的 FastAPI 骨架（config/db/models/schemas/main.py），依赖管理（requirements.txt 含 httpx 和 Pillow 等），DDL 建表（init/01_create_tables.sql），所有模型与 Schema 均已到位。T5 产出的 API 端点和业务服务依赖这些现有基础设施。

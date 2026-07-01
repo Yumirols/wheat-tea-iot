@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.core.logging_config import setup_logging
 from app.db.session import SessionLocal
+from app.api.router import api_router
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ── 路由注册 ────────────────────────────────────────────────────
+
+app.include_router(api_router)
 
 
 # ── 生命周期事件 ────────────────────────────────────────────────
