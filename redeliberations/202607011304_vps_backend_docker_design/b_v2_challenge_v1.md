@@ -1,0 +1,1 @@
+LOCATED:E:\dev\wheat-tea-iot\redeliberations\202607011304_vps_backend_docker_design\b_v2_challenge_v1.md
