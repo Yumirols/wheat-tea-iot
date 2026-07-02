@@ -2,7 +2,7 @@ name: FarmEye Guard Server Test Verification
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main", "master", "test-vps-auto-deploy" ]
     paths:
       - 'server/**'
   pull_request:
