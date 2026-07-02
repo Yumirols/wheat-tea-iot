@@ -36,7 +36,7 @@ chmod 600 ~/.ssh/authorized_keys
 # 本地终端执行
 rsync -avz --delete \
     --exclude='.venv' --exclude='__pycache__' --exclude='.git' \
-    --exclude='*.pyc' --exclude='.env.*' \
+    --exclude='*.pyc' --exclude='.env.dev' --exclude='.env.prod' --exclude='.env' \
     server/ farmeye@<VPS_IP>:/opt/farmeye/
 ```
 

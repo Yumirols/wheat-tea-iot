@@ -103,7 +103,7 @@ jobs:
         run: |
           rsync -avz --delete \
             --exclude='.venv' --exclude='__pycache__' --exclude='.git' \
-            --exclude='*.pyc' --exclude='.env.*' \
+            --exclude='*.pyc' --exclude='.env.dev' --exclude='.env.prod' --exclude='.env' \
             server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/opt/farmeye/
 
       - name: Restart Services and Migrate Database on VPS
