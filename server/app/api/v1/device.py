@@ -6,7 +6,7 @@ FarmEye Guard v1.0 — 设备列表查询端点
 """
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api import deps

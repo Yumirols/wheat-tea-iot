@@ -135,11 +135,9 @@ async def test_ai_idempotent(async_client, sample_ai_payload):
     assert response1.status_code == 200
 
     # 第二次：模拟唯一键冲突（db.commit 抛异常）
-    mock_db_session = None  # 通过局部引用获取
     import app.api.v1.iotda as iotda_module
 
     with pytest.MonkeyPatch.context() as mp:
-        original_add = iotda_module.DiseaseRecord
 
         def _raise_on_add(*args, **kwargs):
             raise Exception('duplicate key value violates unique constraint "uq_disease_device_time"')

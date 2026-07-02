@@ -9,7 +9,7 @@ FarmEye Guard v1.0 — API 全链路集成测试
   - PostgreSQL 容器运行中
   - 依赖覆盖: get_db -> 真实事务 Session, verify_api_key -> 跳过认证
 """
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytest
 from httpx import AsyncClient
@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.models.sensor import SensorSnapshot
 from app.models.disease import DiseaseRecord
-from app.models.control import ControlLog, Device
+from app.models.control import Device
 
 
 @pytest.mark.integration

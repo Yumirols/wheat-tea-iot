@@ -9,7 +9,6 @@ FarmEye Guard v1.0 — 防治建议 API 端点
   - docs/1_system_architecture.md §4.6.1 防治建议响应格式
 """
 from datetime import datetime
-from decimal import Decimal
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query

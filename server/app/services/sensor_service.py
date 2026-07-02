@@ -6,7 +6,6 @@ FarmEye Guard v1.0 — 传感器业务逻辑层
 """
 import logging
 from datetime import date, datetime
-from typing import Optional
 
 from sqlalchemy import func, and_
 from sqlalchemy.orm import Session

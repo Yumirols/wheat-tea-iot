@@ -144,4 +144,3 @@ Mypy 报告的 **16 处** 类型错误集中在 SQLAlchemy 模型属性赋值、
 | **P2** | 修复 `iotda.py` 及 API 层面的 `None` 安全守护，避免 `AttributeError`。 | 1.0h | 低风险 | 运行 `pytest tests/` |
 | **P3** | 在 `app/models/` 实体层重构 SQLAlchemy Column 类型批注或使用 mapped_column，修复 Mypy 的类型推导报错。 | 2.0h | 中风险（涉及实体层） | 运行 `pytest tests/integration/` |
 | **P4** | 修复 `advisory_service.py` 字典 key 的 Column 传参错误，优化数据保留逻辑的 `CursorResult` 类型映射。 | 1.5h | 低风险 | 运行全部测试 |
-| **P5** | 开启 CI 门禁，合并 PR，确认 GitHub Action 的 Ruff 与 MyPy 检测全部通过。 | 0.5h | 无风险 | GitHub Actions 绿标 |

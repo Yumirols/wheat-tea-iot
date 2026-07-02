@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import func, and_
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.models.disease import DiseaseRecord
@@ -100,7 +100,7 @@ def get_disease_stats(
         }
 
     # 按作物类型分组统计
-    crop_counts = dict(
+    rows = (
         db.query(
             DiseaseRecord.crop_type,
             func.count(DiseaseRecord.id),
@@ -109,6 +109,7 @@ def get_disease_stats(
         .group_by(DiseaseRecord.crop_type)
         .all()
     )
+    crop_counts: dict[str, int] = {row.crop_type: row[1] for row in rows}
 
     # 按严重程度分组统计
     severity_counts: dict[str, int] = {}

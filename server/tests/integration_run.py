@@ -34,7 +34,6 @@ import os
 import sys
 import time
 import json
-import uuid
 from typing import Any
 
 import httpx
@@ -88,7 +87,7 @@ def step_health_check() -> bool:
 
     向 /api/v1/health 发送 GET 请求，确认后端 API 服务正常运行。
     """
-    print(f"\n[Step 1/7] 健康检查 GET /api/v1/health ... ", end="", flush=True)
+    print("\n[Step 1/7] 健康检查 GET /api/v1/health ... ", end="", flush=True)
 
     data = _get("/api/v1/health", auth=False)
     status = data.get("data", {}).get("status")
@@ -109,7 +108,7 @@ def step_report_properties() -> bool:
 
     向 /api/v1/iotda/properties/report 发送 IoTDA 标准属性上报 payload。
     """
-    print(f"\n[Step 2/7] 上报环境数据 POST /api/v1/iotda/properties/report ... ",
+    print("\n[Step 2/7] 上报环境数据 POST /api/v1/iotda/properties/report ... ",
           end="", flush=True)
 
     timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
@@ -159,7 +158,7 @@ def step_verify_snapshot() -> bool:
 
     调用 /api/v1/sensor/latest 验证数据已成功写入。
     """
-    print(f"\n[Step 3/7] 校验最新快照 GET /api/v1/sensor/latest?device_id=... ... ",
+    print("\n[Step 3/7] 校验最新快照 GET /api/v1/sensor/latest?device_id=... ... ",
           end="", flush=True)
 
     # 等待异步写入完成
@@ -175,7 +174,7 @@ def step_verify_snapshot() -> bool:
               f"timestamp={latest.get('timestamp')}")
         return True
     else:
-        print(f"[FAIL] latest data not found or device_id mismatch")
+        print("[FAIL] latest data not found or device_id mismatch")
         print(f"        Response: {json.dumps(data, ensure_ascii=False, indent=2)}")
         return False
 
@@ -186,7 +185,7 @@ def step_report_ai() -> bool:
 
     向 /api/v1/iotda/ai/report 发送重度病害 (severity_code=3) AI 结果。
     """
-    print(f"\n[Step 4/7] 上报 AI 重度病害 POST /api/v1/iotda/ai/report ... ",
+    print("\n[Step 4/7] 上报 AI 重度病害 POST /api/v1/iotda/ai/report ... ",
           end="", flush=True)
 
     timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
@@ -230,7 +229,7 @@ def step_query_advisory() -> bool:
     调用 /api/v1/advisory 获取联动建议，
     确认重度病害触发 spray ON 自动动作。
     """
-    print(f"\n[Step 5/7] 查询防治建议 GET /api/v1/advisory?device_id=... ... ",
+    print("\n[Step 5/7] 查询防治建议 GET /api/v1/advisory?device_id=... ... ",
           end="", flush=True)
 
     time.sleep(1)  # 等待后台联动分析完成
@@ -239,7 +238,7 @@ def step_query_advisory() -> bool:
     linkage = data.get("data", {}).get("env_disease_linkage")
 
     if not advisory:
-        print(f"[FAIL] advisory is null/empty")
+        print("[FAIL] advisory is null/empty")
         print(f"        Response: {json.dumps(data, ensure_ascii=False, indent=2)}")
         return False
 
@@ -251,7 +250,7 @@ def step_query_advisory() -> bool:
         print(f"[PASS] auto_action={auto_action}, risk_level={risk_level}")
         return True
     else:
-        print(f"[WARN] advisory found but auto_action not triggered")
+        print("[WARN] advisory found but auto_action not triggered")
         print(f"        advisory: {json.dumps(advisory, ensure_ascii=False)}")
         print(f"        linkage: {json.dumps(linkage, ensure_ascii=False)}")
         # 不直接 FAIL, 记录警告（可能由于配置原因未触发）
@@ -265,10 +264,9 @@ def step_send_command() -> str | None:
     先确保设备在线（通过设备表查询），然后下发手动喷淋指令。
     返回 command_id 供步骤 7 使用。
     """
-    print(f"\n[Step 6/7] 模拟下发控制指令 POST /api/v1/command/send ... ",
+    print("\n[Step 6/7] 模拟下发控制指令 POST /api/v1/command/send ... ",
           end="", flush=True)
 
-    timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
     payload = {
         "device_id": DEVICE_ID,
         "command": "spray ON",
@@ -298,10 +296,10 @@ def step_verify_command_closure(command_id: str) -> bool:
     b. POST /api/v1/iotda/cmd/response 模拟设备回传
     c. GET /api/v1/command/logs 验证 result_code=0
     """
-    print(f"\n[Step 7/7] 控制状态闭环校验 ...", flush=True)
+    print("\n[Step 7/7] 控制状态闭环校验 ...", flush=True)
 
     # 7a. 查询日志确认命令已记录
-    print(f"  [7a] 查询命令日志 ... ", end="", flush=True)
+    print("  [7a] 查询命令日志 ... ", end="", flush=True)
     data = _get(f"/api/v1/command/logs?device_id={DEVICE_ID}")
     records = data.get("data", {}).get("records", [])
     matching = [r for r in records if r.get("command_id") == command_id]
@@ -314,8 +312,7 @@ def step_verify_command_closure(command_id: str) -> bool:
     print(f"[PASS] command_id confirmed in log (source={log_entry.get('source')})")
 
     # 7b. 模拟设备回传执行结果
-    print(f"  [7b] 模拟设备应答 ... ", end="", flush=True)
-    timestamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    print("  [7b] 模拟设备应答 ... ", end="", flush=True)
     cmd_response_payload = {
         "notify_data": {
             "header": {"device_id": DEVICE_ID},
@@ -341,12 +338,12 @@ def step_verify_command_closure(command_id: str) -> bool:
     )
 
     if data.get("code") != 0:
-        print(f"[FAIL] command response not accepted")
+        print("[FAIL] command response not accepted")
         return False
-    print(f"[PASS] command response accepted")
+    print("[PASS] command response accepted")
 
     # 7c. 重新查询验证闭环
-    print(f"  [7c] 验证状态闭环 ... ", end="", flush=True)
+    print("  [7c] 验证状态闭环 ... ", end="", flush=True)
     time.sleep(0.5)
 
     data = _get(f"/api/v1/command/logs?device_id={DEVICE_ID}")
@@ -390,7 +387,7 @@ def main() -> int:
     ok = step_health_check()
     results.append(("健康检查", ok))
     if not ok:
-        print(f"\n[ABORT] 服务未就绪，终止联调")
+        print("\n[ABORT] 服务未就绪，终止联调")
         return 1
 
     # Step 2

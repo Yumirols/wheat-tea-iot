@@ -5,7 +5,7 @@ FarmEye Guard v1.0 — 传感器数据查询端点
 所有端点使用 API Key 认证。
 """
 from datetime import date, datetime
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -35,6 +35,7 @@ async def get_latest_sensor_data(
     """
     snapshots = get_latest_snapshots(db, device_id)
 
+    data: dict[str, Any] | list[dict[str, Any]] | None
     if device_id:
         data = (
             SensorSnapshotRead.model_validate(snapshots[0]).model_dump()

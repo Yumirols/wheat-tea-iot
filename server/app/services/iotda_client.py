@@ -8,7 +8,6 @@ import logging
 from uuid import uuid4
 from typing import Any
 
-import httpx
 
 from app.config import settings
 

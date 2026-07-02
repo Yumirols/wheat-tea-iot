@@ -21,7 +21,6 @@ FarmEye Guard v1.0 — 集成测试专用 Fixture 与配置
   --run-integration 选项和 integration 标记。运行集成测试需要：
       pytest tests/integration/ --run-integration
 """
-import asyncio
 import logging
 from typing import AsyncGenerator
 
@@ -288,7 +287,6 @@ def sample_sensor_payload(test_device_id: str, sample_sensor_properties: dict) -
 def sample_ai_payload_high(test_device_id: str) -> dict:
     """重度病害 AI 识别结果上报 payload (severity_code=3)。"""
     from datetime import datetime
-    import time
     return {
         "resource": "device.message",
         "event": "report",

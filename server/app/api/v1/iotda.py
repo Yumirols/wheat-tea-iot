@@ -120,7 +120,7 @@ async def handle_properties_report(
     if not notify_data:
         raise HTTPException(status_code=422, detail="Missing notify_data")
 
-    device_id = header.get("device_id")
+    device_id = (header or {}).get("device_id")
     if not device_id:
         raise HTTPException(status_code=422, detail="Missing device_id in header")
 
@@ -197,7 +197,7 @@ async def handle_ai_report(
     if not notify_data:
         raise HTTPException(status_code=422, detail="Missing notify_data")
 
-    device_id = header.get("device_id")
+    device_id = (header or {}).get("device_id")
     if not device_id:
         raise HTTPException(status_code=422, detail="Missing device_id in header")
 
@@ -278,7 +278,7 @@ async def handle_command_response(
     if not notify_data:
         raise HTTPException(status_code=422, detail="Missing notify_data")
 
-    device_id = header.get("device_id")
+    device_id = (header or {}).get("device_id")
     if not device_id:
         raise HTTPException(status_code=422, detail="Missing device_id in header")
 

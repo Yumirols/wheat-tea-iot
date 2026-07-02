@@ -3,7 +3,7 @@ FarmEye Guard v1.0 — API 依赖注入
 
 提供 API Key 认证依赖注入和公共依赖导出。
 """
-from fastapi import Header, HTTPException, Depends
+from fastapi import Header, HTTPException
 
 from app.config import settings
 from app.db.session import get_db

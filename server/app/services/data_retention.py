@@ -12,8 +12,9 @@ FarmEye Guard v1.0 — 数据保留定时任务
 """
 import logging
 from datetime import datetime, timedelta, timezone
+from typing import cast
 
-from sqlalchemy import text
+from sqlalchemy import CursorResult, text
 
 from app.config import settings
 from app.db.session import SessionLocal
@@ -43,7 +44,7 @@ def cleanup_expired_data() -> None:
         # 步骤 1：聚合 sensor_snapshot 到 sensor_daily_aggregation
         cutoff_sensor = now - timedelta(days=sensor_retention_days)
 
-        result_agg = db.execute(
+        result_agg: CursorResult = cast(CursorResult, db.execute(
             text(
                 """
                 INSERT INTO sensor_daily_aggregation (
@@ -69,7 +70,7 @@ def cleanup_expired_data() -> None:
                 """
             ),
             {"cutoff": cutoff_sensor},
-        )
+        ))
         logger.info(
             "Data retention step 1: aggregated %d sensor rows (before %s)",
             result_agg.rowcount,
@@ -77,7 +78,7 @@ def cleanup_expired_data() -> None:
         )
 
         # 步骤 2：删除已聚合的 sensor_snapshot 原始明细
-        result_delete_sensor = db.execute(
+        result_delete_sensor: CursorResult = cast(CursorResult, db.execute(
             text(
                 """
                 DELETE FROM sensor_snapshot
@@ -85,7 +86,7 @@ def cleanup_expired_data() -> None:
                 """
             ),
             {"cutoff": cutoff_sensor},
-        )
+        ))
         logger.info(
             "Data retention step 2: deleted %d sensor_snapshot rows (before %s)",
             result_delete_sensor.rowcount,
@@ -94,7 +95,7 @@ def cleanup_expired_data() -> None:
 
         # 步骤 3：删除过期 control_logs 数据
         cutoff_control = now - timedelta(days=control_retention_days)
-        result_delete_control = db.execute(
+        result_delete_control: CursorResult = cast(CursorResult, db.execute(
             text(
                 """
                 DELETE FROM control_logs
@@ -102,7 +103,7 @@ def cleanup_expired_data() -> None:
                 """
             ),
             {"cutoff": cutoff_control},
-        )
+        ))
         logger.info(
             "Data retention step 3: deleted %d control_log rows (before %s)",
             result_delete_control.rowcount,

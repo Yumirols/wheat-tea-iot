@@ -11,7 +11,7 @@ FarmEye Guard v1.0 — CRUD 操作与数据保留集成测试
   - pytest --run-integration 选项已启用
   - PostgreSQL 容器运行中
 """
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import pytest
 from sqlalchemy import text
@@ -262,7 +262,6 @@ class TestDataRetention:
           - 执行 cleanup
           - 验证过期数据被删除，有效数据保留
         """
-        from app.services.data_retention import cleanup_expired_data
 
         now = datetime.utcnow()
 
@@ -428,23 +427,12 @@ class TestConcurrentWrites:
           - 连接 A 插入成功
           - 连接 B 插入相同键，应触发 IntegrityError
         """
-        from app.db.session import SessionLocal
 
         # 使用全局 SessionLocal 获取第二个会话
         # 注意：由于我们的 test_engine 连接的是 farmeye_test，
         # 这里需要用同样的 engine 创建额外 session
-        from sqlalchemy import create_engine
 
         engine = db_session.bind
-        Session2 = type(
-            "Session2",
-            (),
-            {"__call__": lambda s: type(
-                "_Session", (),
-                {"__enter__": lambda s: __import__('sqlalchemy').orm.Session(bind=engine),
-                 "__exit__": lambda *a: None}
-            )()}
-        )
 
         # 直接用 engine 创建额外的 session
         from sqlalchemy.orm import Session as SASession

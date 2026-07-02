@@ -13,7 +13,7 @@ FarmEye Guard v1.0 — DDL / 索引验证集成测试
   - 列定义和数据类型
 """
 import pytest
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 
