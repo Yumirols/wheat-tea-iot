@@ -29,7 +29,7 @@ import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import create_engine, text, Engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import Session
 
 from app.main import app
 from app.api.deps import get_db, verify_api_key
@@ -135,9 +135,10 @@ def test_engine() -> Engine:
         pool_pre_ping=True,
     )
 
-    # ORM 建表
+    # 清理并重建表，确保 schema 与模型定义一致
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    logger.info("Created all ORM tables via Base.metadata.create_all()")
+    logger.info("Recreated all ORM tables via Base.metadata.drop_all/create_all()")
 
     # SQL 级索引
     _create_additional_indexes(engine)
@@ -159,11 +160,13 @@ def db_session(test_engine: Engine) -> Session:
     """
     函数级 fixture：提供独立事务的数据库会话。
 
-    实现事务级回滚隔离：
-      - 每个测试获得独立的数据库连接
-      - 在事务 BEGIN 后创建 Session
-      - 测试结束后 ROLLBACK 事务
-      - 归还连接到连接池
+    实现 savepoint 级回滚隔离：
+      - 每个测试获得独立数据库连接
+      - 使用 join_transaction_mode="create_savepoint" 模式，
+        session.commit() 仅释放 savepoint（非提交外层事务），
+        session.rollback() 仅回滚到 savepoint。
+      - 测试结束后 ROLLBACK 外层事务，撤销所有变更。
+      - 完全隔离，测试间互不影响。
 
     使用示例：
         def test_insert(db_session: Session):
@@ -175,12 +178,10 @@ def db_session(test_engine: Engine) -> Session:
     """
     connection = test_engine.connect()
     transaction = connection.begin()
-    session_local = sessionmaker(
+    session = Session(
         bind=connection,
-        autoflush=False,
-        autocommit=False,
+        join_transaction_mode="create_savepoint",
     )
-    session = session_local()
 
     yield session
 
@@ -264,10 +265,11 @@ def sample_sensor_properties() -> dict:
 @pytest.fixture
 def sample_sensor_payload(test_device_id: str, sample_sensor_properties: dict) -> dict:
     """完整传感器属性上报 payload。"""
+    from datetime import datetime
     return {
         "resource": "device.property",
         "event": "report",
-        "event_time": "20260702T120000Z",
+        "event_time": datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"),
         "notify_data": {
             "header": {"device_id": test_device_id},
             "body": {
@@ -285,10 +287,12 @@ def sample_sensor_payload(test_device_id: str, sample_sensor_properties: dict) -
 @pytest.fixture
 def sample_ai_payload_high(test_device_id: str) -> dict:
     """重度病害 AI 识别结果上报 payload (severity_code=3)。"""
+    from datetime import datetime
+    import time
     return {
         "resource": "device.message",
         "event": "report",
-        "event_time": "20260702T120100Z",
+        "event_time": datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"),
         "notify_data": {
             "header": {"device_id": test_device_id},
             "body": {
@@ -312,10 +316,11 @@ def sample_ai_payload_high(test_device_id: str) -> dict:
 @pytest.fixture
 def sample_ai_payload_moderate(test_device_id: str) -> dict:
     """中度病害 AI 识别结果上报 payload (severity_code=2)。"""
+    from datetime import datetime
     return {
         "resource": "device.message",
         "event": "report",
-        "event_time": "20260702T120100Z",
+        "event_time": datetime.utcnow().strftime("%Y%m%dT%H%M%SZ"),
         "notify_data": {
             "header": {"device_id": test_device_id},
             "body": {

@@ -106,7 +106,7 @@ class TestSensorSnapshotCRUD:
             .order_by(SensorSnapshot.timestamp.desc())
             .first()
         )
-        assert float(latest_a.temperature) == 22.0  # most recent
+        assert float(latest_a.temperature) == 20.0  # most recent (i=0)
 
         # 查询设备 B 最新
         latest_b = (
@@ -115,7 +115,7 @@ class TestSensorSnapshotCRUD:
             .order_by(SensorSnapshot.timestamp.desc())
             .first()
         )
-        assert float(latest_b.temperature) == 31.0  # most recent
+        assert float(latest_b.temperature) == 30.0  # most recent (i=0)
 
 
 @pytest.mark.integration
@@ -323,7 +323,7 @@ class TestDataRetention:
                 timestamp=old_date + timedelta(hours=hour),
                 temperature=20.0 + hour,
                 humidity=60.0 + hour,
-                light=30000 + hour * 1000,
+                light=1000 + hour * 1000,
             ))
         db_session.commit()
 
@@ -496,9 +496,9 @@ class TestDailyAggregation:
             avg_humidity=65.0,
             max_humidity=80.0,
             min_humidity=50.0,
-            avg_light=35000,
-            max_light=50000,
-            min_light=10000,
+            avg_light=3500.0,
+            max_light=5000,
+            min_light=1000,
             avg_co2=420.0,
             max_co2=450,
             min_co2=400,

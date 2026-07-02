@@ -60,7 +60,7 @@ class SensorDailyAggregation(Base):
     min_humidity = Column(Numeric(4, 1))
 
     # 光照统计
-    avg_light = Column(Numeric(5, 1))
+    avg_light = Column(Integer)
     max_light = Column(Integer)
     min_light = Column(Integer)
 

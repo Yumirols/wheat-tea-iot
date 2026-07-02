@@ -157,6 +157,7 @@ async def handle_properties_report(
             device_id,
             exc,
         )
+        db.rollback()
         return {"code": 0, "message": "success"}
 
 
@@ -242,6 +243,7 @@ async def handle_ai_report(
             device_id,
             exc,
         )
+        db.rollback()
         return {"code": 0, "message": "success"}
 
 
