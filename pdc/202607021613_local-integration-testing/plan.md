@@ -1,4 +1,4 @@
-# 任务计划
+﻿# 任务计划
 
 任务描述：依据 docs/local-integration-testing.md 实现集成测试与端到端联调测试代码
 工作目录：pdc/202607021613_local-integration-testing
@@ -100,6 +100,13 @@
 - 需导入：httpx.AsyncClient、sqlalchemy.orm.Session、app.models.sensor.SensorSnapshot、app.models.disease.DiseaseRecord、app.models.control.ControlLog、Device
 
 ---
+
+## R4 PASSED API 全链路集成测试 [ID: T4]
+结果：`server/tests/integration/test_api_integration.py` 已创建，含 4 个测试类（TestPropertiesReportFlow、TestAiReportAdvisoryFlow、TestCommandFlow、TestAdvisoryEnvLinkage），共 6 个测试方法（含 1 个 helper `_seed_device_online`），全部标记 @pytest.mark.integration 和 @pytest.mark.asyncio。
+检查：PASSED -- 402 行与设计文档 SS7.5 逐字符一致，Python 编译通过，所有导入路径有效，7 项检查全部通过。
+
+---
+
 ## R5 NEW 端到端联调脚本 [ID: T5]
 任务：依据 docs/local-integration-testing.md SS7.6 的完整代码，在 `server/tests/integration_run.py` 创建独立端到端联调脚本。
 
