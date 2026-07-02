@@ -24,3 +24,15 @@
 - R2 [T2]: 启动 PostgreSQL 容器并运行集成测试（pytest --run-integration）
 - R3 [T3]: 启动完整 Docker 组并运行端到端联调脚本
 - R4 [T4]: 综合三部分测试结果产出 test_report.md
+
+---
+
+## R1 PASSED 运行单元测试 [ID: T1]
+结果：37 passed, 38 skipped, 0 failed。所有非标记单元测试全部 PASS，集成测试被正确跳过（38 个）。依赖安装解决了 Windows GBK 编码问题。
+检查：PASSED — 7 项检查全部通过，实际测试数据与执行报告一致，未修改源代码文件。
+
+---
+
+## R2 NEW 启动 PostgreSQL 容器并运行集成测试 [ID: T2]
+任务：启动 `docker compose --profile dev up -d db`，然后执行 `pytest tests/integration/ --run-integration -v`，验证 DDL、CRUD、数据保留、并发写入和 API 全链路集成测试全部通过。
+选择理由：R1 单元测试验证基础正确性后，R2 引入真实数据库依赖进行集成测试。先单独启动数据库容器而非完整 Docker 组，可隔离数据库相关问题。
