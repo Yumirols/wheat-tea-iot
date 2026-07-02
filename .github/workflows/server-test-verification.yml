@@ -53,15 +53,13 @@ jobs:
           # 等待 Uvicorn 后端启动完成
           sleep 3
 
-      - name: Run Ruff Lint Check (Non-blocking)
+      - name: Run Ruff Lint Check
         run: |
           ruff check server/app/ server/tests/
-        continue-on-error: true
 
-      - name: Run MyPy Type Check (Non-blocking)
+      - name: Run MyPy Type Check
         run: |
           mypy server/app/
-        continue-on-error: true
 
       - name: Run Unit Tests
         run: |
