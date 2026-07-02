@@ -60,3 +60,9 @@
   - 集成测试：`it_output.txt` — 38 ERROR at setup，根因 `server_default="CURRENT_TIMESTAMP"` 字符串语法
   - E2E 联调：`e2e_output.txt` — 5/7 PASS，2 FAIL（设备 offline）
 - 约束：不要修改任何源代码文件
+
+---
+
+## R4 PASSED 综合三部分测试结果产出测试报告 [ID: T4]
+结果：已创建完整的 `test_report.md`，包含执行环境信息、UT（37 passed/38 skipped/0 failed）逐文件表格、IT（38 ERROR at setup）逐文件表格及 `server_default` 语法根因分析、E2E（5/7 PASS）逐步骤表格及设备 offline 根因分析，以及 NOT ALL PASSED 测试结论。
+检查：PASSED — 15 项检查全部通过，逐文件计数经 R3 修正后与原始输出完全一致，未修改任何源代码文件。
