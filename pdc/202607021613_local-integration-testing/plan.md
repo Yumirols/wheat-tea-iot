@@ -107,6 +107,12 @@
 
 ---
 
+## R5 PASSED 端到端联调脚本 [ID: T5]
+结果：`server/tests/integration_run.py` 已创建，含独立端到端联调脚本，448 行代码，七步联调流程（健康检查→上报环境数据→校验快照→AI上报→查询建议→下发命令→闭环校验），完整退出码 0/1 逻辑。
+检查：PASSED — 7 项检查全部通过，与设计文档 SS7.6 逐字符一致，Python 编译通过，httpx 可用。
+
+---
+
 ## R5 NEW 端到端联调脚本 [ID: T5]
 任务：依据 docs/local-integration-testing.md SS7.6 的完整代码，在 `server/tests/integration_run.py` 创建独立端到端联调脚本。
 
