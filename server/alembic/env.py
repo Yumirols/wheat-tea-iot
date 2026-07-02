@@ -10,9 +10,14 @@ FarmEye Guard v1.0 — Alembic 环境配置
 离线模式（run_migrations_offline）：生成 SQL 脚本而不连接数据库
 在线模式（run_migrations_online）：连接数据库执行迁移
 """
+import sys
+import os
+
+# 将项目根目录加入 sys.path，保证可以正确导入 app 模块
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from logging.config import fileConfig
 from alembic import context
-import os
 
 # 导入 ORM 模型元数据以支持 autogenerate
 from app.db.base import Base
