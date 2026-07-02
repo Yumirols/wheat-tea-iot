@@ -2,7 +2,9 @@ name: FarmEye Guard Server Test Verification
 
 on:
   push:
-    branches: [ "main", "master", "test-vps-auto-deploy" ]
+    branches: [ "main", "master" ]
+    paths:
+      - 'server/**'
 
   pull_request:
     branches: [ "main", "master" ]
@@ -85,7 +87,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     needs: test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/test-vps-auto-deploy')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
 
     steps:
