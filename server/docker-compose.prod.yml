@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  # ── 生产 API 覆写 ────────────────────────────────────────────
+  api:
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - LOG_LEVEL=INFO
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # ── 生产数据库覆写 ──────────────────────────────────────────
+  db:
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 256M
+
+  # ── Nginx 反向代理（生产可选）────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: farmeye-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/farmeye.conf:/etc/nginx/conf.d/farmeye.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - images_data:/usr/share/nginx/images:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: always
+    networks:
+      - farmeye-net
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+        reservations:
+          memory: 32M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,19 @@
+# 环境变量文件（含敏感信息）
+.env*
+!.env.*.example
+
+# Python 缓存与虚拟环境
+__pycache__/
+*.py[cod]
+.venv/
+
+# Git
+.git/
+.gitignore
+
+# 文档
+README.md
+
+# 日志与备份
+logs/
+backups/
