@@ -1,0 +1,129 @@
+[1m============================= test session starts =============================[0m
+platform win32 -- Python 3.11.4, pytest-8.3.5, pluggy-1.6.0 -- E:\python\python311\python.exe
+cachedir: .pytest_cache
+rootdir: E:\dev\wheat-tea-iot\server
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.14.1, asyncio-0.24.0
+asyncio: mode=Mode.STRICT, default_loop_scope=function
+[1mcollecting ... [0mcollected 75 items
+
+tests/integration/test_api_integration.py::TestPropertiesReportFlow::test_properties_report_persists [33mSKIPPED[0m[33m [  1%][0m
+tests/integration/test_api_integration.py::TestPropertiesReportFlow::test_idempotent_properties_report [33mSKIPPED[0m[33m [  2%][0m
+tests/integration/test_api_integration.py::TestAiReportAdvisoryFlow::test_severe_ai_triggers_spray [33mSKIPPED[0m[33m [  4%][0m
+tests/integration/test_api_integration.py::TestAiReportAdvisoryFlow::test_ai_idempotent [33mSKIPPED[0m[33m [  5%][0m
+tests/integration/test_api_integration.py::TestCommandFlow::test_command_send_and_response [33mSKIPPED[0m[33m [  6%][0m
+tests/integration/test_api_integration.py::TestAdvisoryEnvLinkage::test_moderate_disease_with_env_linkage [33mSKIPPED[0m[33m [  8%][0m
+tests/integration/test_db_crud.py::TestSensorSnapshotCRUD::test_insert_and_read [33mSKIPPED[0m[33m [  9%][0m
+tests/integration/test_db_crud.py::TestSensorSnapshotCRUD::test_insert_with_nulls [33mSKIPPED[0m[33m [ 10%][0m
+tests/integration/test_db_crud.py::TestSensorSnapshotCRUD::test_query_latest_per_device [33mSKIPPED[0m[33m [ 12%][0m
+tests/integration/test_db_crud.py::TestDiseaseRecordCRUD::test_insert_and_read [33mSKIPPED[0m[33m [ 13%][0m
+tests/integration/test_db_crud.py::TestDiseaseRecordCRUD::test_linkage_fields [33mSKIPPED[0m[33m [ 14%][0m
+tests/integration/test_db_crud.py::TestControlLogCRUD::test_insert_and_update [33mSKIPPED[0m[33m [ 16%][0m
+tests/integration/test_db_crud.py::TestDeviceCRUD::test_insert_and_unique [33mSKIPPED[0m[33m [ 17%][0m
+tests/integration/test_db_crud.py::TestDeviceCRUD::test_online_default_false [33mSKIPPED[0m[33m [ 18%][0m
+tests/integration/test_db_crud.py::TestDataRetention::test_cleanup_sensor_expired [33mSKIPPED[0m[33m [ 20%][0m
+tests/integration/test_db_crud.py::TestDataRetention::test_cleanup_aggregation_integrity [33mSKIPPED[0m[33m [ 21%][0m
+tests/integration/test_db_crud.py::TestDataRetention::test_cleanup_control_logs [33mSKIPPED[0m[33m [ 22%][0m
+tests/integration/test_db_crud.py::TestConcurrentWrites::test_concurrent_duplicate_sensor_insert [33mSKIPPED[0m[33m [ 24%][0m
+tests/integration/test_db_crud.py::TestDailyAggregation::test_daily_aggregation_calculation [33mSKIPPED[0m[33m [ 25%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_all_tables_exist [33mSKIPPED[0m[33m [ 26%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_sensor_snapshot_columns [33mSKIPPED[0m[33m [ 28%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_disease_records_columns [33mSKIPPED[0m[33m [ 29%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_control_logs_columns [33mSKIPPED[0m[33m [ 30%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_devices_columns [33mSKIPPED[0m[33m [ 32%][0m
+tests/integration/test_db_ddl.py::TestTableExistence::test_sensor_daily_aggregation_columns [33mSKIPPED[0m[33m [ 33%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_unique_index_sensor_device_time [33mSKIPPED[0m[33m [ 34%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_unique_index_disease_device_time [33mSKIPPED[0m[33m [ 36%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_unique_index_control_command_id [33mSKIPPED[0m[33m [ 37%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_index_control_device_time [33mSKIPPED[0m[33m [ 38%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_index_devices_device_id [33mSKIPPED[0m[33m [ 40%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_index_agg_device_date [33mSKIPPED[0m[33m [ 41%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_devices_device_id_unique [33mSKIPPED[0m[33m [ 42%][0m
+tests/integration/test_db_ddl.py::TestIndexExistence::test_daily_agg_unique_constraint [33mSKIPPED[0m[33m [ 44%][0m
+tests/integration/test_db_ddl.py::TestConstraintEnforcement::test_sensor_unique_violation [33mSKIPPED[0m[33m [ 45%][0m
+tests/integration/test_db_ddl.py::TestConstraintEnforcement::test_device_unique_violation [33mSKIPPED[0m[33m [ 46%][0m
+tests/integration/test_db_ddl.py::TestConstraintEnforcement::test_control_log_null_command_id [33mSKIPPED[0m[33m [ 48%][0m
+tests/integration/test_db_ddl.py::TestColumnTypes::test_sensor_decimal_precision [33mSKIPPED[0m[33m [ 49%][0m
+tests/integration/test_db_ddl.py::TestColumnTypes::test_severity_code_smallint [33mSKIPPED[0m[33m [ 50%][0m
+tests/test_advisory.py::test_advisory_with_detection [32mPASSED[0m[33m              [ 52%][0m
+tests/test_advisory.py::test_advisory_no_detection [32mPASSED[0m[33m                [ 53%][0m
+tests/test_advisory.py::test_advisory_with_env_linkage [32mPASSED[0m[33m            [ 54%][0m
+tests/test_command.py::test_send_command_online [32mPASSED[0m[33m                   [ 56%][0m
+tests/test_command.py::test_send_command_offline [32mPASSED[0m[33m                  [ 57%][0m
+tests/test_command.py::test_send_command_missing_field [32mPASSED[0m[33m            [ 58%][0m
+tests/test_command.py::test_logs_source_filter [32mPASSED[0m[33m                    [ 60%][0m
+tests/test_command.py::test_logs_time_range [32mPASSED[0m[33m                       [ 61%][0m
+tests/test_command.py::test_logs_pagination [32mPASSED[0m[33m                       [ 62%][0m
+tests/test_device.py::test_device_list [32mPASSED[0m[33m                            [ 64%][0m
+tests/test_disease.py::test_list_with_filters [32mPASSED[0m[33m                     [ 65%][0m
+tests/test_disease.py::test_list_time_range [32mPASSED[0m[33m                       [ 66%][0m
+tests/test_disease.py::test_statistics [32mPASSED[0m[33m                            [ 68%][0m
+tests/test_disease.py::test_heatmap [32mPASSED[0m[33m                               [ 69%][0m
+tests/test_disease.py::test_empty_result [32mPASSED[0m[33m                          [ 70%][0m
+tests/test_health.py::test_health_healthy [32mPASSED[0m[33m                         [ 72%][0m
+tests/test_health.py::test_health_degraded [32mPASSED[0m[33m                        [ 73%][0m
+tests/test_image.py::test_upload_image [32mPASSED[0m[33m                            [ 74%][0m
+tests/test_image.py::test_upload_image_too_large [32mPASSED[0m[33m                  [ 76%][0m
+tests/test_image.py::test_get_image [32mPASSED[0m[33m                               [ 77%][0m
+tests/test_image.py::test_get_image_not_found [32mPASSED[0m[33m                     [ 78%][0m
+tests/test_iotda_webhook.py::test_properties_report [32mPASSED[0m[33m               [ 80%][0m
+tests/test_iotda_webhook.py::test_ai_report [32mPASSED[0m[33m                       [ 81%][0m
+tests/test_iotda_webhook.py::test_command_response [32mPASSED[0m[33m                [ 82%][0m
+tests/test_iotda_webhook.py::test_properties_idempotent [32mPASSED[0m[33m           [ 84%][0m
+tests/test_iotda_webhook.py::test_ai_idempotent [32mPASSED[0m[33m                   [ 85%][0m
+tests/test_iotda_webhook.py::test_invalid_payload [32mPASSED[0m[33m                 [ 86%][0m
+tests/test_iotda_webhook.py::test_unknown_service_id [32mPASSED[0m[33m              [ 88%][0m
+tests/test_iotda_webhook.py::test_db_write_failure [32mPASSED[0m[33m                [ 89%][0m
+tests/test_iotda_webhook.py::test_device_auto_register [32mPASSED[0m[33m            [ 90%][0m
+tests/test_sensor.py::test_latest_with_device_id [32mPASSED[0m[33m                  [ 92%][0m
+tests/test_sensor.py::test_latest_all [32mPASSED[0m[33m                             [ 93%][0m
+tests/test_sensor.py::test_history_pagination [32mPASSED[0m[33m                     [ 94%][0m
+tests/test_sensor.py::test_history_time_range [32mPASSED[0m[33m                     [ 96%][0m
+tests/test_sensor.py::test_page_size_cap [32mPASSED[0m[33m                          [ 97%][0m
+tests/test_sensor.py::test_page_out_of_range [32mPASSED[0m[33m                      [ 98%][0m
+tests/test_sensor.py::test_daily_aggregation [32mPASSED[0m[33m                      [100%][0m
+
+[33m============================== warnings summary ===============================[0m
+app\main.py:49
+  E:\dev\wheat-tea-iot\server\app\main.py:49: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+..\..\..\python\python311\Lib\site-packages\fastapi\applications.py:4495
+..\..\..\python\python311\Lib\site-packages\fastapi\applications.py:4495
+  E:\python\python311\Lib\site-packages\fastapi\applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+app\main.py:60
+  E:\dev\wheat-tea-iot\server\app\main.py:60: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+tests/test_advisory.py::test_advisory_with_detection
+  E:\python\python311\Lib\site-packages\pytest_asyncio\plugin.py:783: DeprecationWarning: The event_loop fixture provided by pytest-asyncio has been redefined in
+  E:\dev\wheat-tea-iot\server\tests\conftest.py:84
+  Replacing the event_loop fixture with a custom implementation is deprecated
+  and will lead to errors in the future.
+  If you want to request an asyncio event loop with a scope other than function
+  scope, use the "scope" argument to the asyncio mark when marking the tests.
+  If you want to return different types of event loops, use the event_loop_policy
+  fixture.
+  
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+[33m================= [32m37 passed[0m, [33m[1m38 skipped[0m, [33m[1m5 warnings[0m[33m in 0.34s[0m[33m ==================[0m
