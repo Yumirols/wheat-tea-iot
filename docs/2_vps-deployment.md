@@ -1,4 +1,4 @@
-﻿# VPS 后端开发与容器化详细设计和测试方案
+# VPS 后端开发与容器化详细设计和测试方案
 
 > **文档版本**: v9（迭代 v3 修订）
 > **修订依据**: 迭代 v3 要求（a_v3_iteration_requirement.md）
@@ -1583,24 +1583,18 @@ server/tests/
 ├── test_device.py              # 设备列表接口测试
 ├── test_iotda_webhook.py       # IoTDA Webhook 接收端点测试
 ├── test_health.py              # 健康检查端点测试
+├── integration_run.py          # 端到端集成联调脚本 (E2E)
 │
 ├── integration/
 │   ├── __init__.py
-│   ├── test_db_ddl.py          # DDL 验证（表结构检查）
-│   ├── test_db_crud.py         # 基本 CRUD 操作
-│   └── test_db_retention.py    # 数据保留策略验证
+│   ├── conftest.py             # 集成测试专用 fixture
+│   ├── test_db_ddl.py          # DDL 与索引验证
+│   ├── test_db_crud.py         # 基本 CRUD 与数据保留清理验证
+│   └── test_api_integration.py # API 集成测试
 │
-├── docker/
-│   ├── __init__.py
-│   ├── test_container_start.py  # 容器启动测试
-│   ├── test_healthcheck.py      # 健康检查验证
-│   └── test_network.py          # 容器间通信测试
-│
-├── e2e/
-│   ├── __init__.py
-│   └── test_e2e.py             # 端到端全链路测试
-│
-└── conftest_docker.py          # Docker 测试专用 fixture
+├── docker/                     # Docker 相关测试目录
+├── e2e/                        # 端到端测试目录
+└── performance/                # 性能测试目录
 ```
 
 #### 4.1.3 server/tests/conftest.py（全局 fixture 和 pytest 钩子）
@@ -1878,6 +1872,11 @@ TEST_DATABASE_URL = os.getenv(
 )
 ```
 
+> [!IMPORTANT]
+> **SQLAlchemy server_default DDL 渲染规则要点**
+> 在通过 `Base.metadata.create_all(bind=engine)` 初始化集成测试表结构时，ORM 模型中时间戳字段的 `server_default` 必须定义为 `text("CURRENT_TIMESTAMP")`（需从 `sqlalchemy` 导入 `text`），而不能直接使用字符串 `"CURRENT_TIMESTAMP"`。
+> 直接使用字符串值会导致 SQLAlchemy 将其渲染为带单引号的字面量 `'CURRENT_TIMESTAMP'`，在 PostgreSQL 中执行会抛出 `InvalidDatetimeFormat` 异常，从而在 setup 阶段阻塞全部集成测试。
+
 #### 4.3.2 数据库集成测试用例
 
 | # | 测试用例 | 操作 | 预期结果 | 类型 |
@@ -1890,10 +1889,11 @@ TEST_DATABASE_URL = os.getenv(
 | 6 | disease_records 插入与查询 | 插入一条病虫害记录 | SELECT 返回该行 | CRUD |
 | 7 | control_logs 插入与更新 | 先插入，再通过 command_id 更新 result_code | UPDATE 生效 | CRUD |
 | 8 | 日聚合查询 | 向 sensor_snapshot 插入多条数据后查询聚合 | AVG/MAX/MIN 计算正确 | CRUD |
-| 9 | 数据清理（sensor_snapshot 30 天） | 插入 30 天前和 1 天前的数据，运行 cleanup | 仅 30 天前数据被删除 | 保留策略 |
+| 9 | 数据清理（sensor_snapshot 30 点） | 插入 30 天前和 1 天前的数据，运行 cleanup | 仅 30 天前数据被删除 | 保留策略 |
 | 10 | 数据清理（control_logs 90 天） | 插入 90 天前和 1 天前的数据，运行 cleanup | 仅 90 天前数据被删除 | 保留策略 |
 | 11 | 日聚合后再清理数据完整性 | 先聚合 30 天前数据，再删除原始明细 | 聚合表包含正确统计数据 | 保留策略 |
 | 12 | 并发写入（模拟 IoTDA 重试） | 两个连接同时插入相同 (device_id, timestamp) | 仅一条写入成功 | 并发 |
+| 13 | 设备在线状态激活与更新验证 | 调用 `ensure_device_exists()`，针对新建设备及已存在设备进行测试 | 设备 `online` 均成功被置为 `True`，且 `last_seen` 正常更新 | CRUD |
 
 ### 4.4 Docker 容器测试
 
@@ -1933,6 +1933,19 @@ Docker 测试需要 Docker 运行环境，使用 `--run-docker` 选项启用。
 | 5 | 图片上传 → 存储 → 获取 | POST image/upload → 文件写入 volume → GET image/{id} | 上传和获取的图片内容一致 | Full |
 | 6 | 30 天数据保留触发 | 模拟插入超期数据 → 触发 cleanup | 超期数据被聚合和删除 | Full |
 | 7 | 设备在线状态 → 离线识别 | 模拟连续上报 → 停止上报 35s → 查询设备状态 | 设备状态变为 offline | Full |
+
+#### 4.5.3 端到端集成联调流程 (tests/integration_run.py)
+
+上线前可通过独立的可执行脚本 [integration_run.py](wheat-tea-iot/server/tests/integration_run.py) 从外部黑盒视角进行 7 步全链路联调验证：
+
+1. **健康检查** (`GET /api/v1/health`): 确认后端服务和数据库连接处于健康状态。
+2. **上报环境数据** (`POST /api/v1/iotda/properties/report`): 模拟设备向 Webhook 上报环境属性。
+   * *在线状态更新逻辑*：根据 [sensor_service.py](wheat-tea-iot/server/app/services/sensor_service.py) 中 `ensure_device_exists()` 的业务逻辑，在此阶段无论是新建设备（即不存在于设备表中）还是已存在设备（如通过 [02_seed_data.sql](wheat-tea-iot/server/init/02_seed_data.sql) 预植入但默认 `online=FALSE` 的设备 `farmeye_guard_ws63`），在数据上报时，均会被自动激活更新为 `online=True`。
+3. **校验最新快照** (`GET /api/v1/sensor/latest`): 验证上报的数据已被正确持久化并能供查询。
+4. **触发病虫害决策** (`POST /api/v1/iotda/ai/report`): 上报 AI 重度病害识别结果，触发联动分析和自动防治。
+5. **查询防治建议** (`GET /api/v1/advisory`): 校验联动分析引擎在重度病虫害结合环境数据下是否自动生成了控制动作（如 `spray ON`）。
+6. **模拟下发控制指令** (`POST /api/v1/command/send`): 模拟手动下发控制指令。由于步骤 2 已将设备在线状态更新为 `online=True`，下发控制时的在线状态检查将顺利通过。
+7. **控制状态闭环校验** (`POST /api/v1/iotda/cmd/response` + `GET /api/v1/command/logs`): 模拟设备应答控制结果，验证控制日志状态闭环。
 
 ### 4.6 性能与压力测试方案
 
