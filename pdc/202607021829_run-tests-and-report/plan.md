@@ -39,22 +39,24 @@
 
 ---
 
-## R3 NEW 启动完整 Docker 组并运行端到端联调脚本 [ID: T3]
-任务：
-  1. 清理环境：`docker compose --profile dev down`（移除之前的容器残留）
-  2. 启动完整 Docker 组：`docker compose --profile dev up -d`（启动 api-dev + db 两个服务）
-  3. 启动后先确认 api-dev 容器日志，等待服务就绪（可通过 `docker compose logs api-dev` 或等待一段时间后直接运行联调脚本）
-  4. 执行端到端联调脚本：`python tests/integration_run.py`（在 server/ 目录下执行）
-  5. 将完整终端输出保存到工作目录 `pdc/202607021829_run-tests-and-report/e2e_output.txt`
-  6. 编写 `do_v3.md` 执行报告，包含执行过程、逐步骤结果、根因分析（如有失败）
+## R3 PASSED 启动完整 Docker 组并运行端到端联调脚本 [ID: T3]
+结果：完整 Docker 组启动成功（api-dev + db），E2E 联调脚本 5/7 PASS，2 FAIL（步骤6/7：设备 offline 导致下发控制指令失败）。失败根因：设备表中无 online=True 记录。
+检查：PASSED — 7 项检查全部通过（输出文件存在、5/7统计正确、健康检查通过、容器运行正常、根因分析准确、未修改源代码、.env.prod 非本次新增）。
 
-选择理由：R2 已确认数据库容器可正常启动但 ORM schema 存在 bug 导致集成测试全部失败。R3 启动完整 Docker 组（api-dev + db）运行独立于 pytest 的端到端联调脚本。该脚本从外部黑盒视角通过真实 HTTP 请求验证七步闭环流程。预期 health check 步骤可能通过（因为 FastAPI 启动不依赖 schema 验证），但后续步骤（如数据写入、查询）可能因 `server_default` 问题失败。如实记录每一步骤结果即可。
+---
+
+## R4 NEW 综合三部分测试结果产出测试报告 [ID: T4]
+任务：整合 R1 单元测试、R2 数据库集成测试、R3 端到端联调测试的结果，产出完整的 `test_report.md`。
+
+选择理由：
+- 三类测试均已完成并核实，可按原规划进入最终产出步骤
+- R1 37/37 全部通过，R2 38 全部 ERROR，R3 5/7 PASS — 需综合呈现
 
 上下文：
 - 工作根目录：`E:\dev\wheat-tea-iot`
-- Docker Compose 文件：`E:\dev\wheat-tea-iot\server\docker-compose.yml`
-- 端到端脚本：`E:\dev\wheat-tea-iot\server\tests\integration_run.py`
-- docker-compose.yml 已定义 api-dev（开发模式，热重载）和 db（postgres:16-alpine）两个服务
-- 根因已知：ORM 模型的 server_default 字符串语法问题，对应 3 个模型文件（sensor.py、disease.py、control.py）共 9 处
-- 联调脚本七步流程：健康检查 → 上报环境数据 → 校验最新快照 → 触发病虫害决策 → 查询防治建议 → 模拟下发控制指令 → 控制状态闭环校验
-- **约束**：不要修改任何源代码文件
+- 产出文件：`E:\dev\wheat-tea-iot\pdc\202607021829_run-tests-and-report\test_report.md`
+- 测试输出：
+  - 单元测试：`ut_output.txt` — 37 passed, 38 skipped, 0 failed
+  - 集成测试：`it_output.txt` — 38 ERROR at setup，根因 `server_default="CURRENT_TIMESTAMP"` 字符串语法
+  - E2E 联调：`e2e_output.txt` — 5/7 PASS，2 FAIL（设备 offline）
+- 约束：不要修改任何源代码文件
