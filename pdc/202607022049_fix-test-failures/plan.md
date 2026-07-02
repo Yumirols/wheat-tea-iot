@@ -22,3 +22,9 @@
 2. **修正计数**：`server_default="CURRENT_TIMESTAMP"` 实际共9处（sensor.py:3 + disease.py:2 + control.py:4），import 修改3处
 3. **补充验证**：修改后运行 Python 语法检查和相关测试确认修改正确
 选择理由：两个问题均为测试失败根因（问题1导致集成测试38 ERROR，问题2导致E2E 步骤6-7 FAIL），修改量均较小（问题1: 9处 server_default + 3处 import；问题2: 1个文件3处小修改），合并一轮处理可避免碎片化
+
+---
+
+## R2 PASSED 修复 ORM DDL 生成 Bug 及设备注册缺陷 [ID: T1]
+结果：3 个模型文件 9 处 `server_default` 替换为 `text("CURRENT_TIMESTAMP")` + 3 处 import 追加 `text`；sensor_service.py 3 处 online 相关修改（docstring、新建设备分支、else 分支）
+检查：Check 全部 12 项 PASSED，Review APPROVED，无残留旧模式字符串，4 个修改文件均通过 Python 语法检查
