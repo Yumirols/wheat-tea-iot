@@ -6,6 +6,7 @@ FarmEye Guard v1.0 — ControlLog 和 Device ORM 模型
 - devices：设备注册信息
 """
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import Column, BigInteger, String, Integer, Boolean, DateTime, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -43,7 +44,7 @@ class Device(Base):
     mac_addr = Column(String(17))
     ip_addr = Column(String(16))
     registered_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
-    last_seen: Mapped[datetime] = mapped_column(DateTime)
+    last_seen: Mapped[Optional[datetime]] = mapped_column(DateTime)
     online: Mapped[bool] = mapped_column(Boolean, default=False)
 
     created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))

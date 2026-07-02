@@ -31,7 +31,7 @@ class DiseaseRecord(Base):
     linkage_detail: Mapped[Optional[str]] = mapped_column(String(512))
 
     # 关联资源
-    image_path: Mapped[str] = mapped_column(String(512))
+    image_path: Mapped[Optional[str]] = mapped_column(String(512))
     action_taken: Mapped[Optional[str]] = mapped_column(String(128))
 
     created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
