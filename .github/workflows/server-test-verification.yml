@@ -1,0 +1,84 @@
+name: FarmEye Guard Server Test Verification
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'server/**'
+  pull_request:
+    branches: [ "main", "master" ]
+    paths:
+      - 'server/**'
+
+jobs:
+  test:
+    name: Run Comprehensive Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies on Runner
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx ruff mypy
+
+      - name: Configure environment files
+        run: |
+          cp server/.env.dev.example server/.env.dev
+          # 将 localhost:5432 替换为容器间网络中 DB 的名称 db:5432
+          sed -i 's/localhost:5432/db:5432/g' server/.env.dev
+          cp server/.env.prod.example server/.env.prod
+
+      - name: Start Docker Compose services
+        run: |
+          cd server
+          docker compose --profile dev up -d --build api-dev db
+
+      - name: Wait for database to be healthy
+        run: |
+          echo "Waiting for database to start..."
+          until [ "$(docker inspect -f '{{.State.Health.Status}}' farmeye-db)" == "healthy" ]; do
+            echo "Waiting for farmeye-db to be healthy..."
+            sleep 2
+          done
+          echo "Database is healthy!"
+          # 等待 Uvicorn 后端启动完成
+          sleep 3
+
+      - name: Run Ruff Lint Check (Non-blocking)
+        run: |
+          ruff check server/app/ server/tests/
+        continue-on-error: true
+
+      - name: Run MyPy Type Check (Non-blocking)
+        run: |
+          mypy server/app/
+        continue-on-error: true
+
+      - name: Run Unit Tests
+        run: |
+          cd server
+          docker compose exec -T api-dev pytest tests/ -v --ignore=tests/integration --ignore=tests/docker --ignore=tests/e2e
+
+      - name: Run Database Integration Tests
+        run: |
+          cd server
+          docker compose exec -T api-dev pytest tests/integration/ -v --run-integration
+
+      - name: Run End-to-End Tests (E2E)
+        run: |
+          python server/tests/integration_run.py
+
+      - name: Shutdown Docker Compose services
+        if: always()
+        run: |
+          cd server
+          docker compose --profile dev down -v
