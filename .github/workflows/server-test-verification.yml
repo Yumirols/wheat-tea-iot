@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies on Runner
         run: |
           python -m pip install --upgrade pip
-          pip install httpx ruff mypy
+          pip install httpx
 
       - name: Configure environment files
         run: |
@@ -55,11 +55,13 @@ jobs:
 
       - name: Run Ruff Lint Check
         run: |
-          ruff check server/app/ server/tests/
+          cd server
+          docker compose exec -T api-dev ruff check app/ tests/
 
       - name: Run MyPy Type Check
         run: |
-          mypy server/app/
+          cd server
+          docker compose exec -T api-dev mypy app/
 
       - name: Run Unit Tests
         run: |
