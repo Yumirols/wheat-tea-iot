@@ -33,6 +33,28 @@
 
 ---
 
-## R2 NEW 启动 PostgreSQL 容器并运行集成测试 [ID: T2]
-任务：启动 `docker compose --profile dev up -d db`，然后执行 `pytest tests/integration/ --run-integration -v`，验证 DDL、CRUD、数据保留、并发写入和 API 全链路集成测试全部通过。
-选择理由：R1 单元测试验证基础正确性后，R2 引入真实数据库依赖进行集成测试。先单独启动数据库容器而非完整 Docker 组，可隔离数据库相关问题。
+## R2 PASSED 启动 PostgreSQL 容器并运行集成测试 [ID: T2]
+结果：PostgreSQL 容器启动成功（farmeye-db healthy）。38 个集成测试全部 ERROR at setup，根因是 ORM 模型 `server_default="CURRENT_TIMESTAMP"` 字符串语法问题（SQLAlchemy 将字符串加引号渲染导致 PostgreSQL 拒绝 DDL）。Doer 如实记录了失败结果和根因分析。
+检查：PASSED — 7 项检查全部通过（输出文件存在、38 ERROR 统计、InvalidDatetimeFormat 确认、容器运行正常、根因分析准确、修正方案正确、未修改源代码）。
+
+---
+
+## R3 NEW 启动完整 Docker 组并运行端到端联调脚本 [ID: T3]
+任务：
+  1. 清理环境：`docker compose --profile dev down`（移除之前的容器残留）
+  2. 启动完整 Docker 组：`docker compose --profile dev up -d`（启动 api-dev + db 两个服务）
+  3. 启动后先确认 api-dev 容器日志，等待服务就绪（可通过 `docker compose logs api-dev` 或等待一段时间后直接运行联调脚本）
+  4. 执行端到端联调脚本：`python tests/integration_run.py`（在 server/ 目录下执行）
+  5. 将完整终端输出保存到工作目录 `pdc/202607021829_run-tests-and-report/e2e_output.txt`
+  6. 编写 `do_v3.md` 执行报告，包含执行过程、逐步骤结果、根因分析（如有失败）
+
+选择理由：R2 已确认数据库容器可正常启动但 ORM schema 存在 bug 导致集成测试全部失败。R3 启动完整 Docker 组（api-dev + db）运行独立于 pytest 的端到端联调脚本。该脚本从外部黑盒视角通过真实 HTTP 请求验证七步闭环流程。预期 health check 步骤可能通过（因为 FastAPI 启动不依赖 schema 验证），但后续步骤（如数据写入、查询）可能因 `server_default` 问题失败。如实记录每一步骤结果即可。
+
+上下文：
+- 工作根目录：`E:\dev\wheat-tea-iot`
+- Docker Compose 文件：`E:\dev\wheat-tea-iot\server\docker-compose.yml`
+- 端到端脚本：`E:\dev\wheat-tea-iot\server\tests\integration_run.py`
+- docker-compose.yml 已定义 api-dev（开发模式，热重载）和 db（postgres:16-alpine）两个服务
+- 根因已知：ORM 模型的 server_default 字符串语法问题，对应 3 个模型文件（sensor.py、disease.py、control.py）共 9 处
+- 联调脚本七步流程：健康检查 → 上报环境数据 → 校验最新快照 → 触发病虫害决策 → 查询防治建议 → 模拟下发控制指令 → 控制状态闭环校验
+- **约束**：不要修改任何源代码文件

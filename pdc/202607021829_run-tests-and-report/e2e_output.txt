@@ -1,0 +1,40 @@
+﻿============================================================
+  FarmEye Guard 端到端集成联调脚本
+  BASE_URL = http://localhost:8000
+  DEVICE_ID = farmeye_guard_ws63
+============================================================
+
+[Step 1/7] 健康检查 GET /api/v1/health ... [PASS] status=healthy, db_connected=True
+
+[Step 2/7] 上报环境数据 POST /api/v1/iotda/properties/report ... [PASS] snapshot_id=11
+
+[Step 3/7] 校验最新快照 GET /api/v1/sensor/latest?device_id=... ... [PASS] temperature=28.5, humidity=75.0, timestamp=2026-07-02T10:52:19
+
+[Step 4/7] 上报 AI 重度病害 POST /api/v1/iotda/ai/report ... [PASS] disease_record_id=3
+
+[Step 5/7] 查询防治建议 GET /api/v1/advisory?device_id=... ... [PASS] auto_action=spray ON, risk_level=low
+
+[Step 6/7] 模拟下发控制指令 POST /api/v1/command/send ... [FAIL] status=offline, code=0
+        Response: {
+  "code": 0,
+  "message": "success",
+  "data": {
+    "status": "offline",
+    "code": 1003
+  }
+}
+
+============================================================
+  联调结果汇总
+============================================================
+  [PASS] 健康检查
+  [PASS] 上报环境数据
+  [PASS] 校验最新快照
+  [PASS] 上报 AI 病害
+  [PASS] 查询防治建议
+  [FAIL] 下发控制指令
+  [FAIL] 控制状态闭环
+============================================================
+  结果: SOME FAILED - 请检查日志
+============================================================
+
