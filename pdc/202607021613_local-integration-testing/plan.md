@@ -44,9 +44,26 @@
 - 所有用例标记 @pytest.mark.integration
 - 依赖 conftest.py 的 db_session fixture
 
-## 整体轮次规划
-- R1 [T1]: 集成测试基础设施 (__init__.py + conftest.py) ← 已完成 PASSED
-- R2 [T2]: test_db_ddl.py DDL/索引验证测试 ← 当前轮次
-- R3 [T3]: test_db_crud.py CRUD操作+数据保留+并发测试
-- R4 [T4]: test_api_integration.py API全链路测试
-- R5 [T5]: integration_run.py 端到端联调脚本
+## R2 PASSED DDL/索引验证测试 [ID: T2]
+结果：`server/tests/integration/test_db_ddl.py` 已创建，含 4 个测试类（TestTableExistence、TestIndexExistence、TestConstraintEnforcement、TestColumnTypes），共 19 个测试函数，3 个标记 @pytest.mark.slow。
+检查：PASSED — 19 项检查全部通过，与设计文档 SS7.3 逐字符一致，Python 编译通过，AST 结构完整。
+
+---
+
+## R3 NEW CRUD 操作与数据保留测试 [ID: T3]
+任务：依据 docs/local-integration-testing.md SS7.4 的完整代码，在 `server/tests/integration/test_db_crud.py` 创建 CRUD 操作、数据保留清理和并发写入集成测试文件。
+
+选择理由：
+- test_db_crud.py 是集成测试中按依赖顺序的第三个文件，依赖 conftest 提供的 `db_session` fixture，不依赖其他测试文件
+- 独立性好，可以单独运行和验证
+- 内容在设计中已完整定义（SS7.4 约 520 行），只需按文档复制实现
+
+上下文：
+- 设计文档 SS7.4（行 1109-1630）已完整定义 test_db_crud.py 的全部代码
+- 文件包含 7 个测试类：TestSensorSnapshotCRUD、TestDiseaseRecordCRUD、TestControlLogCRUD、TestDeviceCRUD、TestDataRetention、TestConcurrentWrites、TestDailyAggregation
+- 共约 13 个测试方法，其中 4 个标记为 @pytest.mark.slow（3 个 cleanup + 1 个并发）
+- 所有类标记 @pytest.mark.integration
+- 依赖 conftest.py 的 db_session fixture
+- 需要导入：SensorSnapshot, SensorDailyAggregation, DiseaseRecord, ControlLog, Device
+- TestDataRetention 类需局部导入 cleanup_expired_data（但实际使用 SQL DELETE 模拟清理）
+- TestConcurrentWrites 需用 engine 创建额外独立 Session 模拟并发
