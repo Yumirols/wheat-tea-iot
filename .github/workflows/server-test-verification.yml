@@ -82,3 +82,37 @@ jobs:
         run: |
           cd server
           docker compose --profile dev down -v
+
+  deploy:
+    name: Deploy to VPS
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/test-vps-auto-deploy')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH Private Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+
+      - name: Sync code to VPS via Rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.venv' --exclude='__pycache__' --exclude='.git' \
+            --exclude='*.pyc' --exclude='.env.*' \
+            server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}:/opt/farmeye/
+
+      - name: Restart Services and Migrate Database on VPS
+        run: |
+          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }} "
+            cd /opt/farmeye
+            # 以后台模式拉起生产容器组并重新编译
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile production up -d --build
+            # 执行 Alembic 数据库增量迁移，若为首次对齐则执行 stamp 对齐
+            docker compose exec -T api alembic upgrade head || docker compose exec -T api alembic stamp head
+          "
