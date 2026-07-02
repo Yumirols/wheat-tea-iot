@@ -3,7 +3,7 @@ FarmEye Guard v1.0 — DiseaseRecord ORM 模型
 
 映射 disease_records 表，记录病虫害识别结果。
 """
-from sqlalchemy import Column, BigInteger, String, SmallInteger, Numeric, DateTime
+from sqlalchemy import Column, BigInteger, String, SmallInteger, Numeric, DateTime, text
 
 from app.db.base import Base
 
@@ -15,7 +15,7 @@ class DiseaseRecord(Base):
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     device_id = Column(String(64), nullable=False)
-    timestamp = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+    timestamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
     # 识别结果
     crop_type = Column(String(32), nullable=False)
@@ -32,4 +32,4 @@ class DiseaseRecord(Base):
     image_path = Column(String(512))
     action_taken = Column(String(128))
 
-    created_at = Column(DateTime, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))

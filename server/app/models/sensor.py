@@ -5,7 +5,7 @@ FarmEye Guard v1.0 — Sensor ORM 模型
 - sensor_snapshot：环境数据快照（温度、湿度、光照、CO2、土壤NPK等）
 - sensor_daily_aggregation：传感器日聚合数据
 """
-from sqlalchemy import Column, BigInteger, String, Integer, SmallInteger, Numeric, DateTime, Date, UniqueConstraint
+from sqlalchemy import Column, BigInteger, String, Integer, SmallInteger, Numeric, DateTime, Date, UniqueConstraint, text
 
 from app.db.base import Base
 
@@ -18,7 +18,7 @@ class SensorSnapshot(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     device_id = Column(String(64), nullable=False)
     mac_addr = Column(String(17))
-    timestamp = Column(DateTime, nullable=False, server_default="CURRENT_TIMESTAMP")
+    timestamp = Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
     # 环境参数
     temperature = Column(Numeric(4, 1))
@@ -33,7 +33,7 @@ class SensorSnapshot(Base):
     ip_addr = Column(String(16))
     alarm_flag = Column(Integer)
 
-    created_at = Column(DateTime, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class SensorDailyAggregation(Base):
@@ -71,4 +71,4 @@ class SensorDailyAggregation(Base):
 
     record_count = Column(Integer)
 
-    created_at = Column(DateTime, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))

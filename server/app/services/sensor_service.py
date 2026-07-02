@@ -65,7 +65,7 @@ def ensure_device_exists(
     确保设备记录存在。
 
     - 检查 devices 表中是否存在该 device_id
-    - 不存在则创建新 Device 记录（device_id, mac_addr, online=False）
+    - 不存在则创建新 Device 记录（device_id, mac_addr, online=True）
     - 存在则更新 last_seen 为当前时间
     - 返回 Device 对象
     """
@@ -75,7 +75,7 @@ def ensure_device_exists(
         device = Device(
             device_id=device_id,
             mac_addr=mac_addr,
-            online=False,
+            online=True,
             last_seen=datetime.utcnow(),
         )
         db.add(device)
@@ -84,6 +84,7 @@ def ensure_device_exists(
         logger.info("Auto-registered new device: %s", device_id)
     else:
         device.last_seen = datetime.utcnow()
+        device.online = True
         db.commit()
         db.refresh(device)
 
