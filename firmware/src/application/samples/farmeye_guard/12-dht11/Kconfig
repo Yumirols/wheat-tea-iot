@@ -1,0 +1,5 @@
+config DHT11_PIN
+    int
+    prompt "Choose DHT11_PIN pin."
+    default 4
+    depends on ENABLE_DHT11

@@ -1,0 +1,11 @@
+config LED1_PIN
+    int
+    prompt "set the led1."
+    default 2
+    depends on ENABLE_LED
+
+config LED2_PIN
+    int
+    prompt "set the led2."
+    default 3
+    depends on ENABLE_LED

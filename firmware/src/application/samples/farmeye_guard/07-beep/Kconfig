@@ -1,0 +1,5 @@
+config BEEP_PIN
+    int
+    prompt "set the beep."
+    default 0
+    depends on ENABLE_BEEP
