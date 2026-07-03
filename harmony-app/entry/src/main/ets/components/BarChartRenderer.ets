@@ -14,15 +14,15 @@
 @Component
 struct BarChartRenderer {
   @Prop data: number[];
-  @Prop width: number = 360;
-  @Prop height: number = 200;
+  @Prop canvasWidth: number = 360;
+  @Prop canvasHeight: number = 200;
   @State private isReady: boolean = false;
   private context: CanvasRenderingContext2D | null = null;
 
   build() {
     Canvas(this.context)
-      .width(this.width)
-      .height(this.height)
+      .width(this.canvasWidth)
+      .height(this.canvasHeight)
       .onReady(() => {
         if (this.context !== null) {
           this.drawBars(this.context);
@@ -36,8 +36,8 @@ struct BarChartRenderer {
    * @param ctx 画布上下文
    */
   private drawBars(ctx: CanvasRenderingContext2D): void {
-    const height: number = this.height;
-    ctx.clearRect(0, 0, this.width, height);
+    const height: number = this.canvasHeight;
+    ctx.clearRect(0, 0, this.canvasWidth, height);
     ctx.font = '14px sans-serif';
     ctx.fillText('BarChart v1.0 placeholder', 10, height / 2);
   }

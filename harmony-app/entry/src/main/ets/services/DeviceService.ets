@@ -103,7 +103,13 @@ async function refreshDevices(deviceId?: string): Promise<DeviceInfo[]> {
   return getDeviceList(deviceId);
 }
 
-export const DeviceService = {
+export interface DeviceServiceType {
+  getDeviceList: (deviceId?: string) => Promise<DeviceInfo[]>;
+  getCachedDevices: (deviceId?: string) => DeviceInfo[];
+  refreshDevices: (deviceId?: string) => Promise<DeviceInfo[]>;
+}
+
+export const DeviceService: DeviceServiceType = {
   getDeviceList: getDeviceList,
   getCachedDevices: getCachedDevices,
   refreshDevices: refreshDevices

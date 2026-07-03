@@ -15,7 +15,6 @@
  * - `devices: DeviceInfo[]` —— 必填，设备列表
  */
 
-import { AppStorage } from '@kit.ArkUI';
 import { DeviceInfo } from '../common/models';
 
 @Component
@@ -37,14 +36,12 @@ struct DeviceSelector {
   }
 
   build() {
-    Select({
-      options: this.devices.map((d: DeviceInfo): SelectOption => { return { value: d.device_id }; }),
-      selected: this.selectedIndex,
-      onSelect: (index: number, value: string): void => {
+    Select(this.devices.map((d: DeviceInfo): SelectOption => { return { value: d.device_id }; }))
+      .selected(this.selectedIndex)
+      .onSelect((index: number, value: string): void => {
         this.selectedIndex = index;
         AppStorage.set('selectedDeviceId', value);
-      }
-    });
+      });
   }
 }
 

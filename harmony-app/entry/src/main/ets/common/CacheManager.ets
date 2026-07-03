@@ -12,7 +12,14 @@ import { CacheEntry } from './models';
 import { CACHE_DEFAULT_TTL_MS } from './constants';
 import { nowMs } from './utils';
 
-const store: Map<string, CacheEntry<unknown>> = new Map();
+const store: Map<string, CacheEntry<Object>> = new Map();
+
+export interface CacheManagerType {
+  set: <T>(key: string, data: T, ttl?: number) => void;
+  get: <T>(key: string) => T | null;
+  invalidate: (key: string) => void;
+  clear: () => void;
+}
 
 /**
  * 写入缓存条目。
@@ -26,7 +33,7 @@ function set<T>(key: string, data: T, ttl?: number): void {
     timestamp: nowMs(),
     ttl: ttl ?? CACHE_DEFAULT_TTL_MS
   };
-  store.set(key, entry as CacheEntry<unknown>);
+  store.set(key, entry as Object as CacheEntry<Object>);
 }
 
 /**
@@ -34,7 +41,7 @@ function set<T>(key: string, data: T, ttl?: number): void {
  * @param key 缓存键
  */
 function get<T>(key: string): T | null {
-  const entry = store.get(key) as CacheEntry<T> | undefined;
+  const entry = store.get(key) as Object as CacheEntry<T> | undefined;
   if (entry === undefined) {
     return null;
   }
@@ -55,7 +62,7 @@ function clear(): void {
   store.clear();
 }
 
-export const CacheManager = {
+export const CacheManager: CacheManagerType = {
   set: set,
   get: get,
   invalidate: invalidate,

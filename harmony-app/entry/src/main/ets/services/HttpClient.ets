@@ -23,13 +23,17 @@ export const BASE_URL: string = API_BASE_URL + API_PATH_PREFIX;
 /** API Key，供后续 `ImageService` 上传头注入时引用。 */
 export const HEADER_KEY: string = API_KEY;
 
+export interface StatusCodeHolder {
+  statusCode: number;
+}
+
 /**
  * 指数退避重试包装（泛型：兼容 TextResult 与 BinaryResult）。
  * - 命中 `policy.retryOn` 中状态码：进入下一轮（最后一轮直接抛错）
  * - 网络异常且未到末轮：进入下一轮（退避后重试）
  * - 其它情况：返回结果或抛出错误
  */
-async function withRetry<T extends { statusCode: number }>(
+async function withRetry<T extends StatusCodeHolder>(
   operation: () => Promise<T>,
   policy: RetryPolicyConfig = DEFAULT_RETRY
 ): Promise<T> {
@@ -44,8 +48,8 @@ async function withRetry<T extends { statusCode: number }>(
         return result;
       }
     } catch (err) {
-      if (!isNetworkError(err) || attempt === policy.maxRetries) {
-        throw err;
+      if (!isNetworkError(err as Object) || attempt === policy.maxRetries) {
+        throw err as Error;
       }
     }
     const delay = Math.min(
@@ -64,9 +68,8 @@ async function withRetry<T extends { statusCode: number }>(
 export function get<T>(path: string, params?: Record<string, string | number | undefined>): Promise<ApiResponse<T>> {
   const queryString: string = buildQueryString(params ?? {});
   const url: string = BASE_URL + path + queryString;
-  const headers: Record<string, string> = {
-    [HEADER_API_KEY]: HEADER_KEY
-  };
+  const headers: Record<string, string> = {};
+  headers[HEADER_API_KEY] = HEADER_KEY;
 
   return withRetry(() => {
     return request(url, {
@@ -85,16 +88,15 @@ export function get<T>(path: string, params?: Record<string, string | number | u
 }
 
 /**
- * POST 业务方法。
+ * POST 业务方法.
  * 自动注入 `X-Api-Key` 与 `Content-Type: application/json`、JSON 序列化/反序列化。
  * **不**触发重试（POST 非幂等）。
  */
 export function post<T>(path: string, body?: object): Promise<ApiResponse<T>> {
   const url: string = BASE_URL + path;
-  const headers: Record<string, string> = {
-    [HEADER_API_KEY]: HEADER_KEY,
-    'Content-Type': 'application/json'
-  };
+  const headers: Record<string, string> = {};
+  headers[HEADER_API_KEY] = HEADER_KEY;
+  headers['Content-Type'] = 'application/json';
   const extraData: string = body !== undefined ? JSON.stringify(body) : '';
 
   return request(url, {
@@ -120,9 +122,8 @@ export function post<T>(path: string, body?: object): Promise<ApiResponse<T>> {
 export function getRaw(path: string, params?: Record<string, string | number | undefined>): Promise<ArrayBuffer> {
   const queryString: string = buildQueryString(params ?? {});
   const url: string = BASE_URL + path + queryString;
-  const headers: Record<string, string> = {
-    [HEADER_API_KEY]: HEADER_KEY
-  };
+  const headers: Record<string, string> = {};
+  headers[HEADER_API_KEY] = HEADER_KEY;
 
   return withRetry(() => {
     return requestRaw(url, {

@@ -107,14 +107,13 @@ async function getLogs(
   page?: number,
   pageSize?: number
 ): Promise<PaginatedData<CommandLog>> {
-  const queryParams: Record<string, string | number | undefined> = {
-    device_id: deviceId,
-    source: source,
-    start: start,
-    end: end,
-    page: page,
-    page_size: pageSize
-  };
+  const queryParams: Record<string, string | number | undefined> = {};
+  queryParams['device_id'] = deviceId;
+  queryParams['source'] = source;
+  queryParams['start'] = start;
+  queryParams['end'] = end;
+  queryParams['page'] = page;
+  queryParams['page_size'] = pageSize;
 
   const resp: ApiResponse<PaginatedData<CommandLog>> =
     await httpGet<PaginatedData<CommandLog>>('/command/logs', queryParams);
@@ -126,7 +125,12 @@ async function getLogs(
   return resp.data;
 }
 
-export const CommandService = {
+export interface CommandServiceType {
+  send: (deviceId: string, command: string, source?: string, operator?: string) => Promise<CommandResponse>;
+  getLogs: (deviceId?: string, source?: string, start?: string, end?: string, page?: number, pageSize?: number) => Promise<PaginatedData<CommandLog>>;
+}
+
+export const CommandService: CommandServiceType = {
   send: send,
   getLogs: getLogs
 };

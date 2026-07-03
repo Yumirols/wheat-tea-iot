@@ -11,13 +11,13 @@
 // ============================
 
 /** 后端基础 URL（不含 `/api/v1`，由 HttpClient 拼接）。 */
-export const API_BASE_URL: string = 'http://<VPS_IP>:8000';
+export const API_BASE_URL: string = 'http://152.42.170.165';
 
 /** 接口路径前缀（HttpClient 拼接用）。 */
 export const API_PATH_PREFIX: string = '/api/v1';
 
 /** 测试 API Key。 */
-export const API_KEY: string = 'farmeye_dev_key_001';
+export const API_KEY: string = 'farmeye_prod_key_001';
 
 /** 业务鉴权请求头字段名。 */
 export const HEADER_API_KEY: string = 'X-Api-Key';

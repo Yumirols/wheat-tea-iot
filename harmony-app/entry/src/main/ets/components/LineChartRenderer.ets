@@ -27,15 +27,15 @@
 @Component
 struct LineChartRenderer {
   @Prop data: number[];
-  @Prop width: number = 360;
-  @Prop height: number = 200;
+  @Prop canvasWidth: number = 360;
+  @Prop canvasHeight: number = 200;
   @State private isReady: boolean = false;
   private context: CanvasRenderingContext2D | null = null;
 
   build() {
     Canvas(this.context)
-      .width(this.width)
-      .height(this.height)
+      .width(this.canvasWidth)
+      .height(this.canvasHeight)
       .onReady(() => {
         if (this.context !== null) {
           this.drawChart(this.context);
@@ -50,8 +50,8 @@ struct LineChartRenderer {
    */
   private drawChart(ctx: CanvasRenderingContext2D): void {
     const data: number[] = this.data;
-    const width: number = this.width;
-    const height: number = this.height;
+    const width: number = this.canvasWidth;
+    const height: number = this.canvasHeight;
 
     // 0. 空数组防御
     if (data.length === 0) {

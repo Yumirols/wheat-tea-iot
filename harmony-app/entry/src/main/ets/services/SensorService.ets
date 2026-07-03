@@ -48,8 +48,11 @@ async function getLatest(deviceId: string): Promise<SensorSnapshot> {
     return cached;
   }
 
+  const params: Record<string, string | number | undefined> = {};
+  params['device_id'] = deviceId;
+
   const resp: ApiResponse<SensorSnapshot | SensorSnapshot[]> =
-    await httpGet<SensorSnapshot | SensorSnapshot[]>('/sensor/latest', { device_id: deviceId });
+    await httpGet<SensorSnapshot | SensorSnapshot[]>('/sensor/latest', params);
 
   if (resp.code !== 0 || resp.data === null) {
     throw new Error(resp.message || 'Sensor latest error');
@@ -82,8 +85,10 @@ async function getAllLatest(): Promise<SensorSnapshot[]> {
     return cached;
   }
 
+  const params: Record<string, string | number | undefined> = {};
+
   const resp: ApiResponse<SensorSnapshot[]> =
-    await httpGet<SensorSnapshot[]>('/sensor/latest', {});
+    await httpGet<SensorSnapshot[]>('/sensor/latest', params);
 
   if (resp.code !== 0 || resp.data === null) {
     throw new Error(resp.message || 'Sensor all latest error');
@@ -114,13 +119,12 @@ async function getHistory(
   page?: number,
   pageSize?: number
 ): Promise<PaginatedData<SensorHistory>> {
-  const queryParams: Record<string, string | number | undefined> = {
-    device_id: deviceId,
-    start: start,
-    end: end,
-    page: page,
-    page_size: pageSize
-  };
+  const queryParams: Record<string, string | number | undefined> = {};
+  queryParams['device_id'] = deviceId;
+  queryParams['start'] = start;
+  queryParams['end'] = end;
+  queryParams['page'] = page;
+  queryParams['page_size'] = pageSize;
 
   const resp: ApiResponse<PaginatedData<SensorHistory>> =
     await httpGet<PaginatedData<SensorHistory>>('/sensor/history', queryParams);
@@ -153,13 +157,12 @@ async function getDaily(
   page?: number,
   pageSize?: number
 ): Promise<PaginatedData<DailyAggregation>> {
-  const queryParams: Record<string, string | number | undefined> = {
-    device_id: deviceId,
-    start: start,
-    end: end,
-    page: page,
-    page_size: pageSize
-  };
+  const queryParams: Record<string, string | number | undefined> = {};
+  queryParams['device_id'] = deviceId;
+  queryParams['start'] = start;
+  queryParams['end'] = end;
+  queryParams['page'] = page;
+  queryParams['page_size'] = pageSize;
 
   const resp: ApiResponse<PaginatedData<DailyAggregation>> =
     await httpGet<PaginatedData<DailyAggregation>>('/sensor/daily', queryParams);
@@ -171,7 +174,14 @@ async function getDaily(
   return resp.data;
 }
 
-export const SensorService = {
+export interface SensorServiceType {
+  getLatest: (deviceId: string) => Promise<SensorSnapshot>;
+  getAllLatest: () => Promise<SensorSnapshot[]>;
+  getHistory: (deviceId: string, start?: string, end?: string, page?: number, pageSize?: number) => Promise<PaginatedData<SensorHistory>>;
+  getDaily: (deviceId: string, start: string, end: string, page?: number, pageSize?: number) => Promise<PaginatedData<DailyAggregation>>;
+}
+
+export const SensorService: SensorServiceType = {
   getLatest: getLatest,
   getAllLatest: getAllLatest,
   getHistory: getHistory,

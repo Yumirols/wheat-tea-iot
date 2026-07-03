@@ -103,15 +103,16 @@ export function buildQueryString(params: Record<string, string | number | undefi
  * 判断入参是否为原生网络层错误（`@ohos.net.http` 抛出的 `BusinessError`）。
  * 当前实现基于"`err` 含 `code` 属性且 `code` 为数字"的最小判定。
  */
-export function isNetworkError(err: unknown): boolean {
+interface ErrorWithCode {
+  code?: number;
+}
+
+export function isNetworkError(err: Object | null | undefined): boolean {
   if (err === null || err === undefined) {
     return false;
   }
-  if (typeof err !== 'object') {
-    return false;
-  }
-  const obj = err as Record<string, unknown>;
-  const code = obj['code'];
+  const obj = err as ErrorWithCode;
+  const code = obj.code;
   return typeof code === 'number';
 }
 

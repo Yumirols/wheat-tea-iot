@@ -22,21 +22,21 @@ import { BarChartRenderer } from './BarChartRenderer';
 struct ChartView {
   @Prop chartType: 'line' | 'bar' = 'line';
   @Prop dataPoints: number[];
-  @Prop width: number = 360;
-  @Prop height: number = 200;
+  @Prop canvasWidth: number = 360;
+  @Prop canvasHeight: number = 200;
 
   build() {
     if (this.chartType === 'line') {
       LineChartRenderer({
         data: this.dataPoints,
-        width: this.width,
-        height: this.height
+        canvasWidth: this.canvasWidth,
+        canvasHeight: this.canvasHeight
       });
     } else {
       BarChartRenderer({
         data: this.dataPoints,
-        width: this.width,
-        height: this.height
+        canvasWidth: this.canvasWidth,
+        canvasHeight: this.canvasHeight
       });
     }
   }

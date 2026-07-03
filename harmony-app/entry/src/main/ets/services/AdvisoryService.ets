@@ -45,12 +45,13 @@ async function getAdvisory(
     return cached;
   }
 
-  const resp: ApiResponse<Advisory> = await httpGet<Advisory>('/advisory', {
-    device_id: deviceId,
-    start: start,
-    end: end,
-    window_minutes: windowMinutes
-  });
+  const params: Record<string, string | number | undefined> = {};
+  params['device_id'] = deviceId;
+  params['start'] = start;
+  params['end'] = end;
+  params['window_minutes'] = windowMinutes;
+
+  const resp: ApiResponse<Advisory> = await httpGet<Advisory>('/advisory', params);
 
   if (resp.code !== 0 || resp.data === null) {
     throw new Error(resp.message || 'Advisory error');
@@ -60,6 +61,10 @@ async function getAdvisory(
   return resp.data;
 }
 
-export const AdvisoryService = {
+export interface AdvisoryServiceType {
+  getAdvisory: (deviceId?: string, start?: string, end?: string, windowMinutes?: number) => Promise<Advisory>;
+}
+
+export const AdvisoryService: AdvisoryServiceType = {
   getAdvisory: getAdvisory
 };

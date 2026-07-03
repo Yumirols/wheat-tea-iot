@@ -15,9 +15,8 @@
  */
 
 import { http } from '@kit.NetworkKit';
-import { request as ohRequest } from '@kit.RequestKit';
+import { request as ohRequest, BusinessError } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
 
 import { TextResult, BinaryResult, ApiResponse, ImageUploadResult } from './models';
 import { HEADER_API_KEY, DEFAULT_TIMEOUT_MS, UPLOAD_TIMEOUT_MS } from './constants';
@@ -79,7 +78,7 @@ export function requestRaw(url: string, options: RequestOptions): Promise<Binary
       extraData: options.body,
       connectTimeout: DEFAULT_TIMEOUT_MS,
       readTimeout: DEFAULT_TIMEOUT_MS,
-      expectedDataType: http.HttpDataType.ARRAY_BUFFER
+      expectDataType: http.HttpDataType.ARRAY_BUFFER
     }).then((response: http.HttpResponse) => {
       const result: BinaryResult = {
         statusCode: response.responseCode,
@@ -156,8 +155,8 @@ export function uploadFile(
         resolve(placeholder);
       });
 
-      task.on('fail', (err: BusinessError) => {
-        void err;
+      task.on('fail', (states: ohRequest.TaskState[]) => {
+        void states;
         reject(new Error('Upload failed'));
       });
 

@@ -28,7 +28,7 @@ struct ImageViewer {
   build() {
     Stack() {
       if (this.loadStatus === 'loading') {
-        Progress({ type: ProgressType.Circular });
+        Progress({ value: 0, total: 100, type: ProgressType.Ring });
       } else if (this.loadStatus === 'error') {
         Text('图片加载失败')
           .fontSize(14)
@@ -60,7 +60,7 @@ struct ImageViewer {
       const pm: image.PixelMap = await source.createPixelMap();
       this.pixelMap = pm;
       this.loadStatus = 'loaded';
-    } catch (err: unknown) {
+    } catch (err) {
       this.loadStatus = 'error';
       console.error('ImageViewer fallback error', JSON.stringify(err));
     }

@@ -89,10 +89,11 @@ async function getStats(start?: string, end?: string): Promise<DiseaseStats> {
     return cached;
   }
 
-  const resp: ApiResponse<DiseaseStats> = await httpGet<DiseaseStats>('/disease/stats', {
-    start: start,
-    end: end
-  });
+  const params: Record<string, string | number | undefined> = {};
+  params['start'] = start;
+  params['end'] = end;
+
+  const resp: ApiResponse<DiseaseStats> = await httpGet<DiseaseStats>('/disease/stats', params);
 
   if (resp.code !== 0 || resp.data === null) {
     throw new Error(resp.message || 'Disease stats error');
@@ -121,10 +122,11 @@ async function getHeatmap(start?: string, end?: string): Promise<HeatmapData> {
     return cached;
   }
 
-  const resp: ApiResponse<HeatmapData> = await httpGet<HeatmapData>('/disease/heatmap', {
-    start: start,
-    end: end
-  });
+  const params: Record<string, string | number | undefined> = {};
+  params['start'] = start;
+  params['end'] = end;
+
+  const resp: ApiResponse<HeatmapData> = await httpGet<HeatmapData>('/disease/heatmap', params);
 
   if (resp.code !== 0 || resp.data === null) {
     throw new Error(resp.message || 'Disease heatmap error');
@@ -134,7 +136,13 @@ async function getHeatmap(start?: string, end?: string): Promise<HeatmapData> {
   return resp.data;
 }
 
-export const DiseaseService = {
+export interface DiseaseServiceType {
+  getList: (filters?: DiseaseListFilters) => Promise<PaginatedData<DiseaseRecord>>;
+  getStats: (start?: string, end?: string) => Promise<DiseaseStats>;
+  getHeatmap: (start?: string, end?: string) => Promise<HeatmapData>;
+}
+
+export const DiseaseService: DiseaseServiceType = {
   getList: getList,
   getStats: getStats,
   getHeatmap: getHeatmap

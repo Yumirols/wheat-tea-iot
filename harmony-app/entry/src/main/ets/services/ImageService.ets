@@ -81,7 +81,17 @@ async function getImagePixelMap(path: string): Promise<ArrayBuffer> {
   return httpGetRaw('/image/' + path);
 }
 
-export const ImageService = {
+export interface ImageServiceType {
+  uploadImage: (
+    context: common.UIAbilityContext,
+    filePath: string,
+    diseaseRecordId?: number,
+    deviceId?: string
+  ) => Promise<ImageUploadResult>;
+  getImagePixelMap: (path: string) => Promise<ArrayBuffer>;
+}
+
+export const ImageService: ImageServiceType = {
   uploadImage: uploadImage,
   getImagePixelMap: getImagePixelMap
 };

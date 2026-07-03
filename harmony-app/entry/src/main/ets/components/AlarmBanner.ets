@@ -16,27 +16,26 @@
 struct AlarmBanner {
   @Prop message: string;
   @Prop severity: string;
-  @Prop onClose?: () => void;
-  @Prop onTap?: () => void;
+  onClose?: () => void;
+  onTap?: () => void;
 
   build() {
-    if (this.message === '') {
-      // 跳过渲染：父组件可传空字符串隐藏横幅
-      return;
-    }
     Row() {
-      Text(this.message)
-        .layoutWeight(1)
-        .fontSize(14)
-      Text('×')
-        .fontSize(20)
-        .fontColor(Color.Gray)
-        .onClick(() => {
-          this.onClose?.();
-        })
+      if (this.message !== '') {
+        Text(this.message)
+          .layoutWeight(1)
+          .fontSize(14)
+        Text('×')
+          .fontSize(20)
+          .fontColor(Color.Gray)
+          .onClick(() => {
+            this.onClose?.();
+          })
+      }
     }
-    .width('100%')
-    .padding(12)
+    .width(this.message !== '' ? '100%' : 0)
+    .height(this.message !== '' ? undefined : 0)
+    .padding(this.message !== '' ? 12 : 0)
     .backgroundColor(
       this.severity === 'mild' ? '#E8F5E9' :
       this.severity === 'moderate' ? '#FFF3E0' :

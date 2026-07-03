@@ -29,14 +29,17 @@
  * - `pageSize: number = 20` —— 每页条数（本组件不直接使用，供父组件参考）
  */
 
-import { PaginatedData } from '../common/models';
+import { PaginatedData, DiseaseRecord } from '../common/models';
 
 @Component
-struct PaginatedList<T> {
-  @BuilderParam renderItem: (item: T, index: number) => void;
-  @Prop loadPage: (page: number) => Promise<PaginatedData<T>>;
+struct PaginatedList {
+  @BuilderParam renderItem: (item: DiseaseRecord, index: number) => void;
+  loadPage: (page: number) => Promise<PaginatedData<DiseaseRecord>> =
+    (_page: number) => Promise.resolve<PaginatedData<DiseaseRecord>>(
+      { records: [], pagination: { total: 0, page: 1, page_size: 20 } } as PaginatedData<DiseaseRecord>
+    );
   @Prop pageSize: number = 20;
-  @State private records: T[] = [];
+  @State private records: DiseaseRecord[] = [];
   @State private currentPage: number = 1;
   @State private hasMore: boolean = true;
   @State private isLoading: boolean = false;
@@ -47,7 +50,7 @@ struct PaginatedList<T> {
 
   build() {
     List() {
-      ForEach(this.records, (item: T, index: number) => {
+      ForEach(this.records, (item: DiseaseRecord, index: number) => {
         this.renderItem(item, index);
       })
     }
@@ -65,11 +68,11 @@ struct PaginatedList<T> {
   private async loadNextPage(): Promise<void> {
     this.isLoading = true;
     try {
-      const data: PaginatedData<T> = await this.loadPage(this.currentPage);
+      const data: PaginatedData<DiseaseRecord> = await this.loadPage(this.currentPage);
       this.records = this.records.concat(data.records);
       this.hasMore = this.records.length < data.pagination.total;
       this.currentPage++;
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('PaginatedList load error', JSON.stringify(err));
     } finally {
       this.isLoading = false;

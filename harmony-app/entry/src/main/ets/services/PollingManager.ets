@@ -83,7 +83,7 @@ function tick(key: string): void {
     .then(() => {
       // 成功：继续
     })
-    .catch((err: unknown) => {
+    .catch((err: Object) => {
       // 错误：记录但**不**中断轮询
       console.error('PollingManager tick error', JSON.stringify(err));
     })
@@ -205,7 +205,15 @@ function resumeAll(): void {
   }
 }
 
-export const PollingManager = {
+export interface PollingManagerType {
+  start: (key: string, fn: PollingCallback, intervalMs: number) => void;
+  stop: (key: string) => void;
+  stopAll: () => void;
+  suspendAll: () => void;
+  resumeAll: () => void;
+}
+
+export const PollingManager: PollingManagerType = {
   start: start,
   stop: stop,
   stopAll: stopAll,

@@ -18,12 +18,12 @@
 struct LoadingState {
   @Prop status: 'loading' | 'error' | 'empty';
   @Prop errorMessage: string;
-  @Prop onRetry?: () => void;
+  onRetry?: () => void;
 
   build() {
     Column() {
       if (this.status === 'loading') {
-        Progress({ type: ProgressType.Circular })
+        Progress({ value: 0, total: 100, type: ProgressType.Ring })
         Text('加载中...')
           .fontSize(14)
           .fontColor(Color.Gray)

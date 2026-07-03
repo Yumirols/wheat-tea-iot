@@ -28,7 +28,7 @@
 struct ControlButton {
   @Link isOn: boolean;
   @Prop label: string;
-  @Prop onToggle: (target: boolean) => Promise<void> = async (_: boolean): Promise<void> => { /* default no-op */ };
+  onToggle: (target: boolean) => Promise<void> = async (_: boolean): Promise<void> => { /* default no-op */ };
   @State private previousState: boolean = false;
   @State private isPending: boolean = false;
 
@@ -50,7 +50,7 @@ struct ControlButton {
     this.isPending = true;
     try {
       await this.onToggle(target);
-    } catch (err: unknown) {
+    } catch (err) {
       this.isOn = this.previousState;
       console.error('ControlButton toggle error', JSON.stringify(err));
     } finally {
