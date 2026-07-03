@@ -66,8 +66,8 @@ class TestTableExistence:
 
         expected = {
             "id", "device_id", "timestamp",
-            "crop_type", "disease_type", "confidence",
-            "severity", "severity_code",
+            "crop_type", "disease_type", "max_conf",
+            "severity", "severity_code", "object_number", "all_object",
             "linkage_risk_level", "linkage_detail",
             "image_path", "action_taken", "created_at",
         }

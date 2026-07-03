@@ -37,9 +37,11 @@ CREATE TABLE IF NOT EXISTS disease_records (
 
     crop_type       VARCHAR(32) NOT NULL,
     disease_type    VARCHAR(64) NOT NULL,
-    confidence      DECIMAL(4,3),
+    max_conf        DECIMAL(4,3),
     severity        VARCHAR(16) NOT NULL,
     severity_code   SMALLINT NOT NULL,  -- 1=Mild, 2=Moderate, 3=Severe
+    object_number   SMALLINT,
+    all_object      JSON,
 
     linkage_risk_level  VARCHAR(16),    -- 联动风险等级: low / medium / high
     linkage_detail      VARCHAR(512),   -- 联动分析详情

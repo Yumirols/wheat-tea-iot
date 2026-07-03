@@ -202,9 +202,15 @@ def step_report_ai() -> bool:
                         "properties": {
                             "crop_type": "wheat",
                             "disease_type": "rust",
-                            "confidence": 0.95,
-                            "severity": "Severe",
-                            "severity_code": 3,
+                            "object_number": 4,
+                            "max_conf": 0.95,
+                            "all_object": [
+                                {"类别": "rust", "置信度": 0.95, "位置": [10.0, 20.0, 50.0, 60.0]},
+                                {"类别": "rust", "置信度": 0.92, "位置": [12.0, 22.0, 52.0, 62.0]},
+                                {"类别": "rust", "置信度": 0.88, "位置": [14.0, 24.0, 54.0, 64.0]},
+                                {"类别": "rust", "置信度": 0.85, "位置": [16.0, 26.0, 56.0, 66.0]}
+                            ],
+                            "timestamp": 1782736281.0
                         },
                     }
                 ],

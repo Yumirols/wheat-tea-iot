@@ -16,9 +16,11 @@ class DiseaseRecordRead(BaseModel):
     timestamp: datetime
     crop_type: str
     disease_type: str
-    confidence: Optional[float] = None
+    max_conf: Optional[float] = None
     severity: str
     severity_code: int
+    object_number: Optional[int] = None
+    all_object: Optional[list[dict]] = None
     linkage_risk_level: Optional[str] = None
     linkage_detail: Optional[str] = None
     image_path: Optional[str] = None

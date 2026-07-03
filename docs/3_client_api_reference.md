@@ -237,9 +237,22 @@
             "timestamp": "2026-07-03T06:15:00",
             "crop_type": "wheat",
             "disease_type": "rust",
-            "confidence": 0.925,
+            "max_conf": 0.925,
             "severity": "Moderate",
             "severity_code": 2,
+            "object_number": 2,
+            "all_object": [
+              {
+                "类别": "rust",
+                "置信度": 0.925,
+                "位置": [10.0, 20.0, 50.0, 60.0]
+              },
+              {
+                "类别": "rust",
+                "置信度": 0.85,
+                "位置": [30.0, 40.0, 70.0, 80.0]
+              }
+            ],
             "linkage_risk_level": "medium",
             "linkage_detail": "当前环境湿度为 75.0%，温度在 15-25℃ 范围内，适宜锈病孢子萌发与高风险扩散，建议尽快人工巡检与药剂防护。",
             "image_path": "/images/2026/07/03/img_20260703_061500_021.jpg",
@@ -441,7 +454,20 @@
           "disease_type": "rust",
           "severity": "Moderate",
           "severity_code": 2,
-          "confidence": 0.925,
+          "max_conf": 0.925,
+          "object_number": 2,
+          "all_object": [
+            {
+              "类别": "rust",
+              "置信度": 0.925,
+              "位置": [10.0, 20.0, 50.0, 60.0]
+            },
+            {
+              "类别": "rust",
+              "置信度": 0.85,
+              "位置": [30.0, 40.0, 70.0, 80.0]
+            }
+          ],
           "timestamp": "2026-07-03T06:15:00"
         },
         "current_env": {

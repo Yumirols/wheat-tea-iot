@@ -662,9 +662,11 @@ CREATE TABLE IF NOT EXISTS disease_records (
 
     crop_type       VARCHAR(32) NOT NULL,
     disease_type    VARCHAR(64) NOT NULL,
-    confidence      DECIMAL(4,3),
+    max_conf        DECIMAL(4,3),
     severity        VARCHAR(16) NOT NULL,
     severity_code   SMALLINT NOT NULL,  -- 1=Mild, 2=Moderate, 3=Severe
+    object_number   SMALLINT,
+    all_object      JSON,
 
     linkage_risk_level  VARCHAR(16),    -- 联动风险等级: low / medium / high
     linkage_detail      VARCHAR(512),   -- 联动分析详情
@@ -1764,9 +1766,13 @@ def sample_ai_payload() -> dict:
                     "properties": {
                         "crop_type": "wheat",
                         "disease_type": "rust",
-                        "confidence": 0.92,
-                        "severity": "Moderate",
-                        "severity_code": 2
+                        "object_number": 2,
+                        "max_conf": 0.92,
+                        "all_object": [
+                            {"类别": "rust", "置信度": 0.92, "位置": [10.0, 20.0, 50.0, 60.0]},
+                            {"类别": "rust", "置信度": 0.85, "位置": [30.0, 40.0, 70.0, 80.0]}
+                        ],
+                        "timestamp": 1782736281.0
                     }
                 }]
             }
