@@ -129,9 +129,11 @@ class TestDiseaseRecordCRUD:
             timestamp=datetime(2026, 7, 2, 10, 30, 0),
             crop_type="wheat",
             disease_type="rust",
-            confidence=0.95,
+            max_conf=0.95,
             severity="Severe",
             severity_code=3,
+            object_number=4,
+            all_object=[{"类别": "rust", "置信度": 0.95, "位置": [10.0, 20.0, 50.0, 60.0]}],
         )
         db_session.add(record)
         db_session.commit()
@@ -143,6 +145,8 @@ class TestDiseaseRecordCRUD:
         assert result.crop_type == "wheat"
         assert result.disease_type == "rust"
         assert result.severity_code == 3
+        assert result.object_number == 4
+        assert result.all_object is not None
 
     def test_linkage_fields(self, db_session: Session) -> None:
         """验证联动分析字段可写入和读取。"""

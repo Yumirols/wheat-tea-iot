@@ -382,9 +382,13 @@ class TestAdvisoryEnvLinkage:
                             "properties": {
                                 "crop_type": "wheat",
                                 "disease_type": "powdery_mildew",
-                                "confidence": 0.88,
-                                "severity": "Moderate",
-                                "severity_code": 2,
+                                "object_number": 2,
+                                "max_conf": 0.88,
+                                "all_object": [
+                                    {"类别": "powdery_mildew", "置信度": 0.88, "位置": [10.0, 20.0, 50.0, 60.0]},
+                                    {"类别": "powdery_mildew", "置信度": 0.82, "位置": [30.0, 40.0, 70.0, 80.0]}
+                                ],
+                                "timestamp": 1782736281.0
                             },
                         }
                     ],
