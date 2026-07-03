@@ -183,9 +183,13 @@ async def handle_ai_report(
             "properties": {
               "crop_type": "wheat",
               "disease_type": "powdery_mildew",
-              "confidence": 0.95,
-              "severity": "Moderate",
-              "severity_code": 2
+              "object_number": 2,
+              "max_conf": 0.95,
+              "all_object": [
+                {"类别": "powdery_mildew", "置信度": 0.95, "位置": [10.0, 20.0, 50.0, 60.0]},
+                {"类别": "powdery_mildew", "置信度": 0.88, "位置": [30.0, 40.0, 70.0, 80.0]}
+              ],
+              "timestamp": 1782736281.0
             }
           }]
         }
@@ -214,6 +218,27 @@ async def handle_ai_report(
     event_time_str = payload.get("event_time")
     timestamp = _parse_event_time(event_time_str)
 
+    max_conf = properties.get("max_conf")
+    object_number = properties.get("object_number")
+    all_object = properties.get("all_object")
+
+    if object_number is None:
+        object_number = len(all_object) if all_object is not None else 0
+
+    # 根据目标数量计算严重度
+    if object_number == 0:
+        severity = "Normal"
+        severity_code = 0
+    elif object_number == 1:
+        severity = "Mild"
+        severity_code = 1
+    elif 2 <= object_number <= 3:
+        severity = "Moderate"
+        severity_code = 2
+    else:  # object_number >= 4
+        severity = "Severe"
+        severity_code = 3
+
     try:
         # 确保设备记录存在
         ensure_device_exists(db, device_id, properties.get("mac_addr"))
@@ -223,9 +248,11 @@ async def handle_ai_report(
             timestamp=timestamp,
             crop_type=properties.get("crop_type", "unknown"),
             disease_type=properties.get("disease_type", "unknown"),
-            confidence=properties.get("confidence"),
-            severity=properties.get("severity", "Unknown"),
-            severity_code=properties.get("severity_code", 0),
+            max_conf=max_conf,
+            severity=severity,
+            severity_code=severity_code,
+            object_number=object_number,
+            all_object=all_object,
         )
         db.add(record)
         db.commit()

@@ -200,11 +200,13 @@ def get_advisory(
         "disease_type": latest_detection.disease_type,
         "severity": latest_detection.severity,
         "severity_code": latest_detection.severity_code,
-        "confidence": (
-            float(latest_detection.confidence)
-            if latest_detection.confidence is not None
+        "max_conf": (
+            float(latest_detection.max_conf)
+            if latest_detection.max_conf is not None
             else None
         ),
+        "object_number": latest_detection.object_number,
+        "all_object": latest_detection.all_object,
         "timestamp": latest_detection.timestamp,
     }
 

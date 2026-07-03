@@ -32,7 +32,9 @@ class LatestDetection(BaseModel):
     disease_type: str
     severity: str
     severity_code: int
-    confidence: Optional[float] = None
+    max_conf: Optional[float] = None
+    object_number: Optional[int] = None
+    all_object: Optional[list[dict]] = None
     timestamp: datetime
 
     model_config = {"from_attributes": True}

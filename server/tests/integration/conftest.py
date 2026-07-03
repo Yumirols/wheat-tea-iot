@@ -285,7 +285,7 @@ def sample_sensor_payload(test_device_id: str, sample_sensor_properties: dict) -
 
 @pytest.fixture
 def sample_ai_payload_high(test_device_id: str) -> dict:
-    """重度病害 AI 识别结果上报 payload (severity_code=3)。"""
+    """重度病害 AI 识别结果上报 payload (object_number=4 -> severity_code=3)。"""
     from datetime import datetime
     return {
         "resource": "device.message",
@@ -300,9 +300,15 @@ def sample_ai_payload_high(test_device_id: str) -> dict:
                         "properties": {
                             "crop_type": "wheat",
                             "disease_type": "rust",
-                            "confidence": 0.95,
-                            "severity": "Severe",
-                            "severity_code": 3,
+                            "object_number": 4,
+                            "max_conf": 0.95,
+                            "all_object": [
+                                {"类别": "rust", "置信度": 0.95, "位置": [10.0, 20.0, 50.0, 60.0]},
+                                {"类别": "rust", "置信度": 0.92, "位置": [12.0, 22.0, 52.0, 62.0]},
+                                {"类别": "rust", "置信度": 0.88, "位置": [14.0, 24.0, 54.0, 64.0]},
+                                {"类别": "rust", "置信度": 0.85, "位置": [16.0, 26.0, 56.0, 66.0]}
+                            ],
+                            "timestamp": 1782736281.0
                         },
                     }
                 ],
@@ -313,7 +319,7 @@ def sample_ai_payload_high(test_device_id: str) -> dict:
 
 @pytest.fixture
 def sample_ai_payload_moderate(test_device_id: str) -> dict:
-    """中度病害 AI 识别结果上报 payload (severity_code=2)。"""
+    """中度病害 AI 识别结果上报 payload (object_number=2 -> severity_code=2)。"""
     from datetime import datetime
     return {
         "resource": "device.message",
@@ -328,9 +334,13 @@ def sample_ai_payload_moderate(test_device_id: str) -> dict:
                         "properties": {
                             "crop_type": "wheat",
                             "disease_type": "powdery_mildew",
-                            "confidence": 0.88,
-                            "severity": "Moderate",
-                            "severity_code": 2,
+                            "object_number": 2,
+                            "max_conf": 0.88,
+                            "all_object": [
+                                {"类别": "powdery_mildew", "置信度": 0.88, "位置": [10.0, 20.0, 50.0, 60.0]},
+                                {"类别": "powdery_mildew", "置信度": 0.82, "位置": [30.0, 40.0, 70.0, 80.0]}
+                            ],
+                            "timestamp": 1782736281.0
                         },
                     }
                 ],
