@@ -94,6 +94,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Ensure scripts have LF line endings
+        run: |
+          find . -type f -name "*.sh" -exec sed -i 's/\r$//' {} +
+          if [ -f "server/entrypoint.sh" ]; then sed -i 's/\r$//' server/entrypoint.sh; fi
+
       - name: Configure SSH Private Key
         run: |
           mkdir -p ~/.ssh
