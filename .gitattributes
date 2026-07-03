@@ -1,0 +1,2 @@
+# Force bash scripts to use LF line endings, preventing execution errors on Linux/Docker
+*.sh text eol=lf
