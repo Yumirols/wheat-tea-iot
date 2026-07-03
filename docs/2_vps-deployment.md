@@ -502,7 +502,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/farmeye.conf:/etc/nginx/conf.d/farmeye.conf:ro
+      - ./nginx/farmeye.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro     # SSL 证书挂载
       - images_data:/usr/share/nginx/images:ro
     depends_on:
