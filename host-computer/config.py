@@ -8,8 +8,8 @@ import os
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
 
 DEFAULT_CONFIG = {
-    "server_url": "http://127.0.0.1:8000",
-    "server_api_key": "",
+    "server_url": "http://152.42.170.165",
+    "server_api_key": "farmeye_prod_key_001",
     "refresh_interval": 3000,
     "device_id": "farmeye_guard_ws63",
 }

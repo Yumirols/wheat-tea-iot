@@ -31,7 +31,8 @@ class TestConfig(unittest.TestCase):
         with self._patch_path():
             cfg = load()
             self.assertEqual(cfg["device_id"], "farmeye_guard_ws63")
-            self.assertEqual(cfg["server_url"], "http://127.0.0.1:8000")
+            self.assertEqual(cfg["server_url"], "http://152.42.170.165")
+            self.assertEqual(cfg["server_api_key"], "farmeye_prod_key_001")
             self.assertEqual(cfg["refresh_interval"], 3000)
 
     def test_save_and_load(self):
@@ -55,7 +56,8 @@ class TestConfig(unittest.TestCase):
         with patch("config.CONFIG_FILE", self.cfg_path):
             cfg = load()
             self.assertEqual(cfg["device_id"], "custom")
-            self.assertEqual(cfg["server_url"], "http://127.0.0.1:8000")
+            self.assertEqual(cfg["server_url"], "http://152.42.170.165")
+            self.assertEqual(cfg["server_api_key"], "farmeye_prod_key_001")
 
     def test_api_base_construction(self):
         from config import api_base
@@ -149,8 +151,8 @@ class TestApiClient(unittest.TestCase):
     def test_alarm_stats_filters(self):
         payload = {"code": 0, "data": {"total_detections": 50}}
         with patch("requests.get", return_value=self._mock_resp(payload)) as m:
-            self.client.alarm_stats(disease_type="rust")
-            self.assertEqual(m.call_args[1]["params"]["disease_type"], "rust")
+            self.client.alarm_stats(start="2026-06-01")
+            self.assertEqual(m.call_args[1]["params"]["start"], "2026-06-01")
 
     # -- device_control --
     def test_device_control_body(self):
