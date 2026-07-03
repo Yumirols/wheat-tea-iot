@@ -1,0 +1,7 @@
+#当menuconfig中选中了 "WANGLIAN_SAMPLE" , 则会在编译时提供宏定义 
+#  #define  HELLOWORLD_MSG "沈阳网联鸿蒙嵌入开发团队"
+config HELLOWORLD_MSG
+    string
+    prompt "set the value of helloworld."
+    default "沈阳网联鸿蒙嵌入开发团队"
+    depends on WANGLIAN_SAMPLE

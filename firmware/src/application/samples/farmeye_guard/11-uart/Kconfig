@@ -1,0 +1,11 @@
+config UART_BUS
+    int
+    prompt "Set the UART BUS of the currrent sample.[0~2]"
+    default 2
+    depends on WANGLIAN_SAMPLE
+    help
+        This option means the UART BUS of the currrent sample.
+        0: UART0
+        1: UART1
+        2: UART2
+

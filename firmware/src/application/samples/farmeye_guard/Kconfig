@@ -1,0 +1,126 @@
+config ENABLE_HELLOWORLD
+    bool
+    prompt "01-Enable the Test of ENABLE_HELLOWORLD."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of helloworld.
+
+if ENABLE_HELLOWORLD
+menu "Config HelloWorld"
+osource "application/samples/farmeye_guard/01-hello/Kconfig"
+endmenu
+endif
+
+config ENABLE_LED
+    bool
+    prompt "06-Enable the Test of ENABLE_LED."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of ENABLE_LED.
+
+if ENABLE_LED
+menu "Config ENABLE_LED"
+osource "application/samples/farmeye_guard/06-led/Kconfig"
+endmenu
+endif
+
+config ENABLE_BEEP
+    bool
+    prompt "07-Enable the Test of ENABLE_BEEP."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of Beep.
+
+if ENABLE_BEEP
+menu "Config ENABLE_BEEP"
+osource "application/samples/farmeye_guard/07-beep/Kconfig"
+endmenu
+endif
+
+config ENABLE_UART
+    bool
+    prompt "11-Enable the Test of ENABLE_UART."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of ENABLE_UART.
+
+if ENABLE_UART
+menu "Config UART_test"
+osource "application/samples/farmeye_guard/11-uart/Kconfig"
+endmenu
+endif
+
+config ENABLE_DHT11
+    bool
+    prompt "12-Enable the Test of ENABLE_DHT11."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of ENABLE_DHT11.
+
+if ENABLE_DHT11
+menu "Config ENABLE_DHT11"
+osource "application/samples/farmeye_guard/12-dht11/Kconfig"
+endmenu
+endif
+
+config ENABLE_ADC
+    bool
+    prompt "13-Enable the Test of ENABLE_ADC."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of ENABLE_ADC.
+
+if ENABLE_ADC
+menu "Config ENABLE_ADC"
+osource "application/samples/farmeye_guard/13-adc/Kconfig"
+endmenu
+endif
+
+config ENABLE_CO2
+    bool
+    prompt "14-Enable the Test of CO2 Sensor."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the CO2 sensor module.
+
+if ENABLE_CO2
+menu "Config CO2"
+osource "application/samples/farmeye_guard/14-co2/Kconfig"
+endmenu
+endif
+
+config ENABLE_VOICE
+    bool
+    prompt "19-Enable the Test of ENABLE_VOICE."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option means enable the test of ENABLE_VOICE.
+
+if ENABLE_VOICE
+menu "Config ENABLE_VOICE"
+osource "application/samples/farmeye_guard/19-voice/Kconfig"
+endmenu
+endif
+
+config ENABLE_FARMEYE_GUARD
+    bool
+    prompt "Enable FarmEye Guard System."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        This option enables the FarmEye Guard pest & disease monitoring system.
+
+if ENABLE_FARMEYE_GUARD
+menu "Config FarmEye Guard"
+osource "application/samples/farmeye_guard/main/Kconfig"
+osource "application/samples/farmeye_guard/tests/Kconfig"
+endmenu
+endif

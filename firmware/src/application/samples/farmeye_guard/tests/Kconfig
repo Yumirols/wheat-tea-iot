@@ -1,0 +1,55 @@
+config TEST_DHT11
+    bool
+    prompt "Test DHT11 sensor."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run DHT11 temperature/humidity sensor unit tests.
+
+config TEST_CO2
+    bool
+    prompt "Test CO2 sensor (MH-Z19C)."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run MH-Z19C CO2 sensor unit tests on UART2.
+
+config TEST_ULTRASONIC
+    bool
+    prompt "Test ultrasonic sensor (HC-SR04)."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run HC-SR04 ultrasonic distance unit tests.
+
+config TEST_LED_BEEP
+    bool
+    prompt "Test LED blink and beeper."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run LED blink and beeper unit tests.
+
+config TEST_RELAY
+    bool
+    prompt "Test relay control."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run spray and irrigation relay unit tests.
+
+config TEST_OLED
+    bool
+    prompt "Test OLED display (SSD1306)."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run SSD1306 OLED display unit tests via I2C.
+
+config TEST_ALARM
+    bool
+    prompt "Test alarm thresholds and actuators."
+    default n
+    depends on FARMEYE_GUARD_SAMPLE
+    help
+        Run alarm bitmask, threshold values, and actuator integration tests.

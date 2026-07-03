@@ -1,0 +1,11 @@
+config CO2_UART_BUS
+    int
+    prompt "CO2 sensor UART bus (0=UART0, 1=UART1, 2=UART2)"
+    default 1
+    depends on ENABLE_CO2
+
+config CO2_COLLECT_INTERVAL_MS
+    int
+    prompt "CO2 collect interval (ms)"
+    default 5000
+    depends on ENABLE_CO2
