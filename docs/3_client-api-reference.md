@@ -23,10 +23,10 @@
 
 ### 1.3 认证机制 (API Key)
 客户端在发起任何 REST 请求时，必须在 HTTP 请求头中添加 `X-Api-Key` 字段。
-*   **测试密钥**：`farmeye_dev_key_001`
+*   **测试密钥**：`farmeye_prod_key_001`
 *   **请求头示例**：
     ```http
-    X-Api-Key: farmeye_dev_key_001
+    X-Api-Key: farmeye_prod_key_001
     ```
 > **注意**：如果 VPS 后端的 `API_KEYS` 环境变量未配置或为空（本地开发调试模式），后端将自动跳过 API Key 校验。但在正式联调与表现层开发时，**建议一律携带此请求头**。
 

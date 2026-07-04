@@ -190,6 +190,25 @@ Thumbs.db
 
 *.log
 
+reference/
+
 .claude/
 .opencode/
 CLAUDE.md
+
+# =======================================================================
+# 鸿蒙移动应用 (HarmonyOS / DevEco Studio)
+# =======================================================================
+# 忽略 Node.js 和 ohpm 依赖包目录
+**/node_modules/
+**/oh_modules/
+
+# 忽略本地 SDK 路径及个性化配置
+**/local.properties
+**/.hvigor/
+**/.cxx/
+**/.clangd/
+**/.clang-format
+**/.clang-tidy
+**/.appanalyzer/
+**/oh-package-lock.json5

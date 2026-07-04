@@ -37,8 +37,8 @@
 │             │ SQL (psycopg2/SQLAlchemy)     │ HTTP API              │
 │             ▼                               │                       │
 │  ┌──────────────────────┐                   │                       │
-│  │  金仓数据库           │                   │                       │
-│  │  (KingbaseES)        │                   │                       │
+│  │  PostgreSQL 16       │                   │                       │
+│  │                      │                   │                       │
 │  └──────────────────────┘                   │                       │
 │                                             │                       │
 └─────────────────────────────────────────────┼───────────────────────┘
@@ -691,7 +691,7 @@ CREATE INDEX idx_agg_device_date ON sensor_daily_aggregation (device_id, agg_dat
 | 基础 URL | `http://<VPS_IP>:8000/api/v1` |
 | 请求 Content-Type | `application/json` |
 | 响应 Content-Type | `application/json` |
-| 认证方式 | 初版暂用无认证/API Key 双模式：开发调试期可用无认证（VPS IP 白名单 + 内网）；生产部署须启用 API Key 认证（HTTP Header `X-API-Key`），服务端通过环境变量 `API_KEYS`（逗号分隔的密钥列表）校验。鸿蒙 App 和上位机在请求时携带 `X-API-Key` 头 |
+| 认证方式 | 初版暂用无认证/API Key 双模式：开发调试期可用无认证（VPS IP 白名单 + 内网）；生产部署须启用 API Key 认证（HTTP Header `X-API-Key`），服务端通过环境变量 `API_KEYS`（逗号分隔的密钥列表）校验。鸿蒙 App 和上位机在请求时携带 `X-API-Key` 头。特别约定：为适配移动端与上位机 native 图像渲染组件，服务端的静态图片资源目录（`/images/...`）在生产环境下免除 API Key 鉴权，允许匿名 GET 访问。 |
 | 时间戳格式 | ISO 8601 / `YYYY-MM-DDTHH:mm:ss`（API 响应使用无时区格式；IoTDA Webhook 推送的 `event_time` 使用 UTC 时区后缀 `Z`，接收端需兼容处理） |
 | 分页参数 | `?page=1&page_size=20`，默认 `page_size=20`，最大 100。`page_size` 超过 100 时服务端自动截断为 100 并返回 HTTP 200（非错误），同时在响应中回显实际使用的 `page_size` 值。`page` 超出实际页数时返回空列表 |
 
