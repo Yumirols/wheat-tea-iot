@@ -37,9 +37,9 @@ struct AlarmBanner {
     .height(this.message !== '' ? undefined : 0)
     .padding(this.message !== '' ? 12 : 0)
     .backgroundColor(
-      this.severity === 'mild' ? '#E8F5E9' :
-      this.severity === 'moderate' ? '#FFF3E0' :
-      this.severity === 'severe' ? '#FFEBEE' :
+      this.severity?.toLowerCase() === 'mild' ? '#E8F5E9' :
+      this.severity?.toLowerCase() === 'moderate' ? '#FFF3E0' :
+      this.severity?.toLowerCase() === 'severe' ? '#FFEBEE' :
       '#F5F5F5'
     )
     .onClick(() => {

@@ -30,16 +30,15 @@ struct LineChartRenderer {
   @Prop canvasWidth: number = 360;
   @Prop canvasHeight: number = 200;
   @State private isReady: boolean = false;
-  private context: CanvasRenderingContext2D | null = null;
+  private settings: RenderingContextSettings = new RenderingContextSettings(true);
+  private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
 
   build() {
     Canvas(this.context)
       .width(this.canvasWidth)
       .height(this.canvasHeight)
       .onReady(() => {
-        if (this.context !== null) {
-          this.drawChart(this.context);
-        }
+        this.drawChart(this.context);
         this.isReady = true;
       });
   }
@@ -61,16 +60,18 @@ struct LineChartRenderer {
     // 1. 清空画布
     ctx.clearRect(0, 0, width, height);
 
-    // 2. 绘制 X 轴（底部水平线）
+    // 2. 绘制 X 轴和 Y 轴（加 10px 边距防切边）
+    ctx.strokeStyle = '#cbd5e1'; // 浅灰色轴线
+    ctx.lineWidth = 1;
+
     ctx.beginPath();
-    ctx.moveTo(0, height - 1);
-    ctx.lineTo(width, height - 1);
+    ctx.moveTo(10, height - 10);
+    ctx.lineTo(width - 10, height - 10);
     ctx.stroke();
 
-    // 3. 绘制 Y 轴（左侧垂直线）
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, height);
+    ctx.moveTo(10, 10);
+    ctx.lineTo(10, height - 10);
     ctx.stroke();
 
     // 4. 归一化数据
@@ -80,10 +81,16 @@ struct LineChartRenderer {
 
     // 5. 折线段绘制
     ctx.beginPath();
-    const stepX: number = data.length > 1 ? width / (data.length - 1) : width;
+    ctx.strokeStyle = '#00b894'; // 翡翠绿折线配色
+    ctx.lineWidth = 2;
+
+    const chartWidth = width - 20;
+    const chartHeight = height - 20;
+    const stepX: number = data.length > 1 ? chartWidth / (data.length - 1) : chartWidth;
+
     for (let i = 0; i < data.length; i++) {
-      const x: number = i * stepX;
-      const y: number = height - ((data[i] - min) / range) * height;
+      const x: number = 10 + i * stepX;
+      const y: number = (height - 10) - ((data[i] - min) / range) * chartHeight;
       if (i === 0) {
         ctx.moveTo(x, y);
       } else {

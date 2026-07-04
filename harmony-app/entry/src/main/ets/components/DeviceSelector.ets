@@ -19,28 +19,48 @@ import { DeviceInfo } from '../common/models';
 
 @Component
 struct DeviceSelector {
-  @Prop devices: DeviceInfo[];
+  @Prop @Watch('syncSelectedIndex') devices: DeviceInfo[];
+  @StorageLink('selectedDeviceId') @Watch('syncSelectedIndex') selectedDeviceId: string = '';
   @State selectedIndex: number = 0;
+  @State selectedDeviceName: string = '';
 
   aboutToAppear(): void {
-    // 初始化 AppStorage 键（已存在则保留）
-    AppStorage.setOrCreate('selectedDeviceId', '');
-    // 读取持久值并按 device_id 匹配索引同步 selectedIndex
-    const stored: string | undefined = AppStorage.get<string>('selectedDeviceId');
-    if (stored !== undefined && stored !== '') {
-      const idx: number = this.devices.findIndex((d: DeviceInfo): boolean => d.device_id === stored);
-      if (idx >= 0) {
-        this.selectedIndex = idx;
+    this.syncSelectedIndex();
+  }
+
+  private syncSelectedIndex(): void {
+    if (this.devices && this.devices.length > 0) {
+      if (this.selectedDeviceId !== '') {
+        const idx: number = this.devices.findIndex((d: DeviceInfo): boolean => d.device_id === this.selectedDeviceId);
+        if (idx >= 0) {
+          this.selectedIndex = idx;
+          this.selectedDeviceName = this.devices[idx].device_name || '';
+          return;
+        }
       }
+      this.selectedIndex = 0;
+      this.selectedDeviceName = this.devices[0].device_name || '';
+      this.selectedDeviceId = this.devices[0].device_id;
+    } else {
+      this.selectedDeviceName = '';
     }
   }
 
   build() {
-    Select(this.devices.map((d: DeviceInfo): SelectOption => { return { value: d.device_id }; }))
+    Select(this.devices.map((d: DeviceInfo): SelectOption => { return { value: d.device_name }; }))
       .selected(this.selectedIndex)
+      .value(this.devices.length > 0 ? (this.devices[this.selectedIndex]?.device_name || '') : '')
+      .font({ size: 14, weight: FontWeight.Medium })
+      .fontColor('#1e2a38')
+      .selectedOptionFont({ size: 14 })
+      .optionFont({ size: 14 })
+      .width(140)
       .onSelect((index: number, value: string): void => {
-        this.selectedIndex = index;
-        AppStorage.set('selectedDeviceId', value);
+        if (index >= 0 && index < this.devices.length) {
+          this.selectedIndex = index;
+          this.selectedDeviceName = this.devices[index].device_name || '';
+          this.selectedDeviceId = this.devices[index].device_id;
+        }
       });
   }
 }

@@ -149,31 +149,23 @@ struct Index {
     }
   }
 
+  @Builder
+  customTitle() {
+    Row({ space: 8 }) {
+      Text('农眼卫视终端')
+        .fontSize(18)
+        .fontWeight(FontWeight.Bold)
+        .fontColor('#1e2a38')
+      if (!this.isLoadingDevices && this.devices.length > 0) {
+        DeviceSelector({ devices: this.devices })
+      }
+    }
+    .alignItems(VerticalAlign.Center)
+  }
+
   build() {
     Navigation(this.pageStack) {
       Column() {
-        // App Header Card
-        Column() {
-          Row() {
-            Text('麦茶物联网终端')
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor('#1e2a38')
-            Blank()
-            if (!this.isLoadingDevices && this.devices.length > 0) {
-              DeviceSelector({ devices: this.devices })
-            }
-          }
-          .width('100%')
-          .alignItems(VerticalAlign.Center)
-        }
-        .padding(16)
-        .width('95%')
-        .margin({ top: 12, bottom: 8 })
-        .backgroundColor('rgba(255, 255, 255, 0.75)')
-        .border({ width: 1, color: 'rgba(104, 159, 210, 0.15)' })
-        .borderRadius(16)
-        .shadow({ radius: 24, color: 'rgba(104, 159, 210, 0.08)', offsetX: 0, offsetY: 8 })
 
         // Status Indicators
         ConnectivityIndicator({ status: this.connectivity })
@@ -324,6 +316,7 @@ struct Index {
       .height('100%')
       .backgroundColor('#f5f7fa')
     }
+    .title(this.customTitle)
     .titleMode(NavigationTitleMode.Mini)
     .navDestination(this.pageMap)
   }

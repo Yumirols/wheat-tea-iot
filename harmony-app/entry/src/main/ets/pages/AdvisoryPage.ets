@@ -251,7 +251,8 @@ export struct AdvisoryPage {
               .fontSize(13)
               .fontColor('#7f8c8d')
             Blank()
-            Text(`${(this.advisoryData.latest_detection.confidence * 100).toFixed(1)}%`)
+            Text(this.advisoryData.latest_detection.max_conf !== undefined && this.advisoryData.latest_detection.max_conf !== null && !isNaN(this.advisoryData.latest_detection.max_conf) ?
+              `${(this.advisoryData.latest_detection.max_conf * 100).toFixed(1)}%` : '--')
               .fontSize(13)
               .fontColor('#1e2a38')
               .fontWeight(FontWeight.Medium)

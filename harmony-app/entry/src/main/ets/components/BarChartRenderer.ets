@@ -17,16 +17,15 @@ struct BarChartRenderer {
   @Prop canvasWidth: number = 360;
   @Prop canvasHeight: number = 200;
   @State private isReady: boolean = false;
-  private context: CanvasRenderingContext2D | null = null;
+  private settings: RenderingContextSettings = new RenderingContextSettings(true);
+  private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
 
   build() {
     Canvas(this.context)
       .width(this.canvasWidth)
       .height(this.canvasHeight)
       .onReady(() => {
-        if (this.context !== null) {
-          this.drawBars(this.context);
-        }
+        this.drawBars(this.context);
         this.isReady = true;
       });
   }

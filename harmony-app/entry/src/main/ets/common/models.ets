@@ -89,7 +89,7 @@ export interface DiseaseRecord {
   timestamp: string;
   crop_type: string;
   disease_type: string;
-  confidence: number;
+  max_conf?: number;
   severity: string;
   severity_code: number;
   linkage_risk_level: string;
@@ -164,7 +164,7 @@ export interface AdvisoryDetection {
   disease_type: string;
   severity: string;
   severity_code: number;
-  confidence: number;
+  max_conf?: number;
   timestamp: string;
 }
 

@@ -64,7 +64,7 @@ export struct DiseaseRecordsPage {
             .fontColor('#7f8c8d')
             .margin({ top: 6 })
           
-          Text(`置信度: ${(item.confidence * 100).toFixed(1)}%`)
+          Text(`置信度: ${item.max_conf !== undefined && item.max_conf !== null && !isNaN(item.max_conf) ? (item.max_conf * 100).toFixed(1) + '%' : '--'}`)
             .fontSize(12)
             .fontColor('#7f8c8d')
             .margin({ top: 4 })
@@ -110,9 +110,9 @@ export struct DiseaseRecordsPage {
                 .margin({ right: 8 })
               
               Row({ space: 8 }) {
-                this.FilterChip('全部', '', this.cropFilter === '', (val) => { this.cropFilter = val; })
-                this.FilterChip('小麦', 'wheat', this.cropFilter === 'wheat', (val) => { this.cropFilter = val; })
-                this.FilterChip('茶叶', 'tea', this.cropFilter === 'tea', (val) => { this.cropFilter = val; })
+                FilterChip({ label: '全部', value: '', isActive: this.cropFilter === '', onChipClick: (val) => { this.cropFilter = val; } })
+                FilterChip({ label: '小麦', value: 'wheat', isActive: this.cropFilter === 'wheat', onChipClick: (val) => { this.cropFilter = val; } })
+                FilterChip({ label: '茶叶', value: 'tea', isActive: this.cropFilter === 'tea', onChipClick: (val) => { this.cropFilter = val; } })
               }
             }
             .width('100%')
@@ -127,10 +127,10 @@ export struct DiseaseRecordsPage {
                 .margin({ right: 8 })
               
               Row({ space: 8 }) {
-                this.FilterChip('全部', '', this.severityFilter === '', (val) => { this.severityFilter = val; })
-                this.FilterChip('轻度', 'mild', this.severityFilter === 'mild', (val) => { this.severityFilter = val; })
-                this.FilterChip('中度', 'moderate', this.severityFilter === 'moderate', (val) => { this.severityFilter = val; })
-                this.FilterChip('重度', 'severe', this.severityFilter === 'severe', (val) => { this.severityFilter = val; })
+                FilterChip({ label: '全部', value: '', isActive: this.severityFilter === '', onChipClick: (val) => { this.severityFilter = val; } })
+                FilterChip({ label: '轻度', value: 'Mild', isActive: this.severityFilter === 'Mild', onChipClick: (val) => { this.severityFilter = val; } })
+                FilterChip({ label: '中度', value: 'Moderate', isActive: this.severityFilter === 'Moderate', onChipClick: (val) => { this.severityFilter = val; } })
+                FilterChip({ label: '重度', value: 'Severe', isActive: this.severityFilter === 'Severe', onChipClick: (val) => { this.severityFilter = val; } })
               }
             }
             .width('100%')
@@ -225,7 +225,7 @@ export struct DiseaseRecordsPage {
                     this.InfoRow('设备 ID', this.selectedRecord.device_id)
                     this.InfoRow('作物种类', this.selectedRecord.crop_type === 'wheat' ? '小麦' : this.selectedRecord.crop_type === 'tea' ? '茶叶' : this.selectedRecord.crop_type)
                     this.InfoRow('病害名称', this.selectedRecord.disease_type)
-                    this.InfoRow('识别置信度', `${(this.selectedRecord.confidence * 100).toFixed(1)}%`)
+                    this.InfoRow('识别置信度', this.selectedRecord.max_conf !== undefined && this.selectedRecord.max_conf !== null && !isNaN(this.selectedRecord.max_conf) ? `${(this.selectedRecord.max_conf * 100).toFixed(1)}%` : '--')
                     
                     Row() {
                       Text('严重程度')
@@ -276,20 +276,7 @@ export struct DiseaseRecordsPage {
     .title('病虫害记录')
   }
 
-  @Builder
-  FilterChip(label: string, value: string, isActive: boolean, onClick: (val: string) => void) {
-    Text(label)
-      .fontSize(12)
-      .fontWeight(isActive ? FontWeight.Bold : FontWeight.Normal)
-      .fontColor(isActive ? '#ffffff' : '#34495e')
-      .backgroundColor(isActive ? '#4cd9c0' : 'rgba(255, 255, 255, 0.5)')
-      .border({ width: 1, color: isActive ? '#4cd9c0' : 'rgba(104, 159, 210, 0.15)' })
-      .borderRadius(12)
-      .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-      .onClick(() => {
-        onClick(value);
-      })
-  }
+
 
   @Builder
   InfoRow(label: string, val: string) {
@@ -305,5 +292,27 @@ export struct DiseaseRecordsPage {
     }
     .width('100%')
     .padding({ top: 6, bottom: 6 })
+  }
+}
+
+@Component
+struct FilterChip {
+  @Prop label: string;
+  @Prop value: string;
+  @Prop isActive: boolean;
+  onChipClick: (val: string) => void = () => {};
+
+  build() {
+    Text(this.label)
+      .fontSize(12)
+      .fontWeight(this.isActive ? FontWeight.Bold : FontWeight.Normal)
+      .fontColor(this.isActive ? '#ffffff' : '#34495e')
+      .backgroundColor(this.isActive ? '#4cd9c0' : 'rgba(255, 255, 255, 0.5)')
+      .border({ width: 1, color: this.isActive ? '#4cd9c0' : 'rgba(104, 159, 210, 0.15)' })
+      .borderRadius(12)
+      .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+      .onClick(() => {
+        this.onChipClick(this.value);
+      })
   }
 }
