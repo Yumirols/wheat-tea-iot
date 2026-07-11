@@ -34,31 +34,56 @@ struct DeviceSelector {
         const idx: number = this.devices.findIndex((d: DeviceInfo): boolean => d.device_id === this.selectedDeviceId);
         if (idx >= 0) {
           this.selectedIndex = idx;
-          this.selectedDeviceName = this.devices[idx].device_name || '';
+          this.selectedDeviceName = this.devices[idx].device_name || this.devices[idx].device_id || '';
           return;
         }
       }
       this.selectedIndex = 0;
-      this.selectedDeviceName = this.devices[0].device_name || '';
+      this.selectedDeviceName = this.devices[0].device_name || this.devices[0].device_id || '';
       this.selectedDeviceId = this.devices[0].device_id;
     } else {
       this.selectedDeviceName = '';
     }
   }
 
+  private truncateDeviceName(name: string): string {
+    if (!name) {
+      return '';
+    }
+    const maxLen = 16;
+    if (name.length <= maxLen) {
+      return name;
+    }
+
+    // Special handling for '<hex_id>_<name>' pattern
+    const underscoreIndex = name.indexOf('_');
+    if (underscoreIndex > 0 && name.length - underscoreIndex > 3) {
+      const prefix = name.substring(0, Math.min(6, underscoreIndex));
+      const suffix = name.substring(underscoreIndex); // includes the underscore
+      const result = prefix + '...' + suffix;
+      if (result.length <= maxLen + 4) {
+        return result;
+      }
+    }
+
+    // Fallback: simple tail truncation
+    return name.substring(0, maxLen - 3) + '...';
+  }
+
   build() {
-    Select(this.devices.map((d: DeviceInfo): SelectOption => { return { value: d.device_name }; }))
+    Select(this.devices.map((d: DeviceInfo): SelectOption => { return { value: this.truncateDeviceName(d.device_name || d.device_id || '') }; }))
       .selected(this.selectedIndex)
-      .value(this.devices.length > 0 ? (this.devices[this.selectedIndex]?.device_name || '') : '')
+      .value(this.devices.length > 0 ? this.truncateDeviceName(this.devices[this.selectedIndex]?.device_name || this.devices[this.selectedIndex]?.device_id || '') : '')
       .font({ size: 14, weight: FontWeight.Medium })
       .fontColor('#1e2a38')
       .selectedOptionFont({ size: 14 })
       .optionFont({ size: 14 })
       .width(140)
+      .height(36)
       .onSelect((index: number, value: string): void => {
         if (index >= 0 && index < this.devices.length) {
           this.selectedIndex = index;
-          this.selectedDeviceName = this.devices[index].device_name || '';
+          this.selectedDeviceName = this.devices[index].device_name || this.devices[index].device_id || '';
           this.selectedDeviceId = this.devices[index].device_id;
         }
       });

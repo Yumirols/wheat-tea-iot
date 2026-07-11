@@ -151,8 +151,8 @@ struct Index {
 
   @Builder
   customTitle() {
-    Row({ space: 8 }) {
-      Text('农眼卫视终端')
+    Row({ space: 16 }) {
+      Text('农眼卫士终端')
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
         .fontColor('#1e2a38')
@@ -161,6 +161,8 @@ struct Index {
       }
     }
     .alignItems(VerticalAlign.Center)
+    .height('100%')
+    .margin({ left: 12 })
   }
 
   build() {
@@ -302,7 +304,6 @@ struct Index {
                 this.NavCard('环境数据分析', '查看温湿度、CO2等传感器历史趋势曲线', 'DashboardPage', '#689fd2')
                 this.NavCard('病虫害记录', '麦草作物病害AI自动检测与分类识别历史', 'DiseaseRecordsPage', '#b39ddb')
                 this.NavCard('设备远程控制', '远程开启或关闭LED灯、警报蜂鸣器、水泵', 'ControlPage', '#4cd9c0')
-                this.NavCard('AI 防治建议', '基于大模型联动分析提供最优农业生产防治决策', 'AdvisoryPage', '#f48fb1')
               }
               .width('95%')
               .margin({ bottom: 20 })
