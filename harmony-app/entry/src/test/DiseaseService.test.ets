@@ -28,9 +28,9 @@ export default function diseaseServiceTest() {
       // 验证：getStats 缓存命中
       const cached: DiseaseStats = {
         total_detections: 42,
-        by_crop: { tomato: 30, cucumber: 12 },
-        by_severity: { low: 25, medium: 12, high: 5 },
-        by_disease: { blight: 20, rust: 22 }
+        by_crop: { 'tomato': 30, 'cucumber': 12 },
+        by_severity: { 'low': 25, 'medium': 12, 'high': 5 },
+        by_disease: { 'blight': 20, 'rust': 22 }
       };
 
       const key = CACHE_KEY_PREFIX_DISEASE_STATS + 'all_all';
@@ -78,9 +78,9 @@ export default function diseaseServiceTest() {
       // 预填充缓存后调用 await DiseaseService.getStats()（不传参），应返回预填充数据
       const cached: DiseaseStats = {
         total_detections: 42,
-        by_crop: { tomato: 30, cucumber: 12 },
-        by_severity: { low: 25, medium: 12, high: 5 },
-        by_disease: { blight: 20, rust: 22 }
+        by_crop: { 'tomato': 30, 'cucumber': 12 },
+        by_severity: { 'low': 25, 'medium': 12, 'high': 5 },
+        by_disease: { 'blight': 20, 'rust': 22 }
       };
 
       const key = CACHE_KEY_PREFIX_DISEASE_STATS + 'all_all';
@@ -135,9 +135,9 @@ export default function diseaseServiceTest() {
       // 验证：只传 start（end undefined）时，key 为 'prefix + start + "_" + "all"'
       const cached: DiseaseStats = {
         total_detections: 15,
-        by_crop: { wheat: 15 },
-        by_severity: { low: 15 },
-        by_disease: { rust: 15 }
+        by_crop: { 'wheat': 15 },
+        by_severity: { 'low': 15 },
+        by_disease: { 'rust': 15 }
       };
 
       const key = CACHE_KEY_PREFIX_DISEASE_STATS + '2026-06-01' + '_' + 'all';
@@ -154,9 +154,9 @@ export default function diseaseServiceTest() {
       // 验证：只传 end（start undefined）时，key 为 'prefix + "all" + "_" + end'
       const cached: DiseaseStats = {
         total_detections: 25,
-        by_crop: { rice: 25 },
-        by_severity: { medium: 25 },
-        by_disease: { blast: 25 }
+        by_crop: { 'rice': 25 },
+        by_severity: { 'medium': 25 },
+        by_disease: { 'blast': 25 }
       };
 
       const key = CACHE_KEY_PREFIX_DISEASE_STATS + 'all' + '_' + '2026-06-30';
