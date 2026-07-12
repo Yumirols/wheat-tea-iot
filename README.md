@@ -1,8 +1,6 @@
 # FarmEye Guard (农眼卫士) v1.0
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Server CI](https://github.com/Yumirols/wheat-tea-iot/actions/workflows/server-test-verification.yml/badge.svg)](https://github.com/Yumirols/wheat-tea-iot/actions/workflows/server-test-verification.yml)
-[![Host CI](https://github.com/Yumirols/wheat-tea-iot/actions/workflows/host-computer-ci.yml/badge.svg)](https://github.com/Yumirols/wheat-tea-iot/actions/workflows/host-computer-ci.yml)
 
 基于物联网环境监测与边缘 AI 图像识别的小麦、茶叶病虫害智能识别与防治决策系统。系统采用 **"端-云-台"三层架构**，覆盖嵌入式感知、边缘智能推理、云端业务处理与多端交互。
 
