@@ -10,9 +10,7 @@ FarmEye Guard v1.0 — 基础架构与核心组件单元测试
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi import HTTPException
-from sqlalchemy import text
 
-from app.config import settings
 from app.api.deps import verify_api_key
 from app.core.logging_config import setup_logging
 from app.db.session import get_db
@@ -64,8 +62,8 @@ async def test_verify_api_key_invalid():
 def test_setup_logging():
     """测试日志初始化设置"""
     with patch("app.core.logging_config.Path.mkdir") as mock_mkdir, \
-         patch("app.core.logging_config.RotatingFileHandler") as mock_rotating_handler, \
-         patch("app.core.logging_config.logging.StreamHandler") as mock_stream_handler, \
+         patch("app.core.logging_config.RotatingFileHandler"), \
+         patch("app.core.logging_config.logging.StreamHandler"), \
          patch("app.core.logging_config.logging.getLogger") as mock_get_logger:
         
         mock_root_logger = MagicMock()
