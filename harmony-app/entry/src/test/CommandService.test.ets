@@ -22,33 +22,32 @@ export default function commandServiceTest() {
 
     it('send_when_device_not_in_cache_proceeds_to_http_not_throwing_Device_offline', 0, async () => {
       // 验证：缓存中无该设备时，前置校验放行（不抛 'Device offline'）
-      // 测试环境无后端，HTTP 阶段会失败，但失败原因不是 'Device offline'
+      // 测试环境无后端，或者有后端时因参数类型不符（传空对象）触发 422 报错
       let thrownError: Error | null = null;
       try {
-        await CommandService.send('unknown_device', 'led ON');
+        await CommandService.send('unknown_device', new Object() as string);
       } catch (e) {
         thrownError = e as Error;
       }
 
-      // 必须抛错（因为无后端 HTTP 会失败）
+      // 必须抛错（因为无后端 HTTP 失败，或有后端时 422 校验失败）
       expect(thrownError !== null).assertTrue();
       // 但抛错的 message **不**应是前置校验的 'Device offline'
-      // 实际抛出的是网络/业务错误（如 'HTTP ...' 或 'JSON parse error' 等）
       if (thrownError !== null) {
         expect(thrownError.message === 'Device offline').assertFalse();
       }
     });
 
     it('getLogs_passes_through_to_http_without_cache', 0, async () => {
-      // 验证：getLogs 不写缓存，调用即触发 HTTP（无后端应抛网络错）
+      // 验证：getLogs 不写缓存，调用即触发 HTTP（无后端抛网络错，有后端时传非法参数触发 422）
       let thrownError: Error | null = null;
       try {
-        await CommandService.getLogs('dev_001');
+        await CommandService.getLogs('dev_001', undefined, undefined, undefined, 0);
       } catch (e) {
         thrownError = e as Error;
       }
 
-      // 无后端环境应失败
+      // 无后端环境或 422 报错，均应失败
       expect(thrownError !== null).assertTrue();
       // 不应是 cache 相关错误
       if (thrownError !== null) {
@@ -60,7 +59,7 @@ export default function commandServiceTest() {
       // 验证：getLogs 传多个参数时仍走 HTTP（不抛 Device offline 等前置校验伪阳性）
       let thrownError: Error | null = null;
       try {
-        await CommandService.getLogs('dev_001', 'manual', '2026-07-01', '2026-07-03', 1, 20);
+        await CommandService.getLogs('dev_001', 'manual', '2026-07-01', '2026-07-03', 0, 20);
       } catch (e) {
         thrownError = e as Error;
       }

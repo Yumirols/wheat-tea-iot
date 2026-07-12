@@ -364,7 +364,7 @@ def test_evaluate_linkage():
     unknown_detection = DiseaseRecord(disease_type="unknown_pest")
     res_unknown = advisory_service.evaluate_linkage(unknown_detection, env_high)
     assert res_unknown["risk_level"] == "low"
-    assert res_unknown["recommendation"] == f"未知病虫害类型（unknown_pest），无法进行联动分析，建议保持常规监测。"
+    assert res_unknown["recommendation"] == "未知病虫害类型（unknown_pest），无法进行联动分析，建议保持常规监测。"
 
 
 def test_build_recommendation():

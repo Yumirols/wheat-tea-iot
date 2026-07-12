@@ -30,7 +30,7 @@ export default function advisoryServiceTest() {
           disease_type: 'blight',
           severity: 'medium',
           severity_code: 2,
-          confidence: 0.85,
+          max_conf: 0.85,
           timestamp: '2026-07-03T10:00:00Z'
         },
         current_env: {
@@ -105,11 +105,12 @@ export default function advisoryServiceTest() {
     });
 
     it('getAdvisory_cache_miss_proceeds_to_http', 0, async () => {
-      // 验证：缓存未命中时 getAdvisory 请求 HTTP（无后端抛网络错误）
+      // 验证：缓存未命中时 getAdvisory 请求 HTTP（无后端抛网络错误，有后端时传非法参数触发 422）
       // before 每个 case 已清空缓存
       let thrownError: Error | null = null;
       try {
-        await AdvisoryService.getAdvisory('unknown_device');
+        // 传入非法的 windowMinutes (0) 确保即便网络通畅，后端也会因为参数校验（ge=1）报错
+        await AdvisoryService.getAdvisory('unknown_device', undefined, undefined, 0);
       } catch (e) {
         thrownError = e as Error;
       }

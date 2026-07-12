@@ -1,0 +1,12 @@
+{
+  "include": [
+    // 必须以模块名开头，指定需要统计覆盖率的业务代码目录
+    "entry/src/main/ets/services",
+    "entry/src/main/ets/common",
+    "entry/src/main/ets/entryability",
+    "entry/src/main/ets/entrybackupability"
+  ],
+  "exclude": [
+    // 可选：排除不需要统计的文件
+  ]
+}

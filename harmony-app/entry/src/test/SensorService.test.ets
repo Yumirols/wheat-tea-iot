@@ -140,10 +140,11 @@ export default function sensorServiceTest() {
     });
 
     it('getHistory_does_not_cache_and_passes_through_to_http', 0, async () => {
-      // 验证：getHistory 不读缓存，直接请求 HTTP（无后端应抛网络错误）
+      // 验证：getHistory 不读缓存，直接请求 HTTP（无后端抛网络错误，有后端时传非法参数触发 422）
       let thrownError: Error | null = null;
       try {
-        await SensorService.getHistory('dev_001');
+        // 传入非法的 page (0) 确保即便网络通畅，后端也会因为参数校验（ge=1）报错
+        await SensorService.getHistory('dev_001', undefined, undefined, 0);
       } catch (e) {
         thrownError = e as Error;
       }
@@ -152,10 +153,11 @@ export default function sensorServiceTest() {
     });
 
     it('getDaily_does_not_cache_and_passes_through_to_http', 0, async () => {
-      // 验证：getDaily 不读缓存，直接请求 HTTP（无后端应抛网络错误）
+      // 验证：getDaily 不读缓存，直接请求 HTTP（无后端抛网络错误，有后端时传非法参数触发 422）
       let thrownError: Error | null = null;
       try {
-        await SensorService.getDaily('dev_001', '2026-07-01', '2026-07-03');
+        // 传入非法的 page (0) 确保即便网络通畅，后端也会因为参数校验（ge=1）报错
+        await SensorService.getDaily('dev_001', '2026-07-01', '2026-07-03', 0);
       } catch (e) {
         thrownError = e as Error;
       }
